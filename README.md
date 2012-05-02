@@ -5,7 +5,7 @@ Middleware for using Shibboleth with Django.  Requires Django 1.3 or above for R
 
 Installation Configuration
 ------
- * python setup.py install
+ * ```pip install git+git://github.com/Brown-University-Library/django-shibboleth-remoteuser.git```
  
  * In settings.py :
  
