@@ -29,7 +29,7 @@ Installation Configuration
    
    ```python
     MIDDLEWARE_CLASSES += (
-      'shibboleth.middleware.BulShibRemoteUserMiddleware',
+      'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
     )
     ```
 
