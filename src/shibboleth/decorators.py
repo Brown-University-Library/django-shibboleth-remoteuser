@@ -3,7 +3,7 @@ from shibboleth.middleware import parse_attributes
 
 def login_optional(func):
   """
-  Decorator to pull Shib attributes and log user in possible.  Does not 
+  Decorator to pull Shib attributes and log user in, if possible.  Does not 
   enforce login.
   """
   def decorator(request,*args, **kwargs):
