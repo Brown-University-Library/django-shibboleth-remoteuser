@@ -1,0 +1,23 @@
+{
+  "Shib-Application-ID": "default", 
+  "Shib-Authentication-Instant": "2011-12-09T18:46:08.139Z", 
+  "Shib-Authentication-Method": "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified", 
+  "Shib-AuthnContext-Class": "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified", 
+  "Shib-Identity-Provider": "https://sso.college.edu/idp/shibboleth", 
+  "Shib-Session-ID": "1", 
+  "Shib-Session-Index": "12", 
+  "Shibboleth-affiliation": "member@college.edu;staff@college.edu", 
+  "Shibboleth-brownBarCode": "12345678",
+  "Shibboleth-brownNetId": "Sample_Developer", 
+  "Shibboleth-brownStatus": "active", 
+  "Shibboleth-department": "University Library, Integrated Technology Services", 
+  "Shibboleth-displayName": "Sample Developer", 
+  "Shibboleth-eppn": "sampledeveloper@college.edu", 
+  "Shibboleth-givenName": "Sample", 
+  "Shibboleth-isMemberOf": "BROWN:COMMUNITY:EMPLOYEE:ADMINISTRATIVE:BASE;BROWN:COMMUNITY:EMPLOYEE:STAFF:SAC:P;COMMUNITY:ALL;BROWN:COMMUNITY:EMPLOYEE:STAFF:SAC:M;BROWN:SERVICES:RIGHTANSWERS:USERS;BROWN:COMMUNITY:PRESIDENT:ALL;BROWN:COMMUNITY:LICENSE:FACSTAFF;BROWN:COMMUNITY:ALL;BROWN:COMMUNITY:LICENSE:FACSTAFFMS;BROWN:COMMUNITY:ADMIN:MM:PROD:COMMUNITY:EMPLOYEE:EXEMPT:ALL;BROWN:COMMUNITY:PRESIDENT:ON_OFF_CAMPUS;BROWN:COMMUNITY:EMPLOYEE:STAFF:SAC:EXEMPT_NONEXEMPT;BROWN:COMMUNITY:EMPLOYEE:BENEFITS:NOUNION;BROWN:COMMUNITY:EMPLOYEE:ALL;BROWN:COMMUNITY:TRANSPORTATION:FACSTAFF;BROWN:COMMUNITY:EMPLOYEE:NONSTUDENT;BROWN:COMMUNITY:LICENSE:FACSTAFFGRAD;BROWN:COMMUNITY:LICENSE:FACSTAFFNONMED;BROWN:COMMUNITY:EMPLOYEE:STAFF:SAC:EXEMPT_NONEXEMPT_UNION;BROWN:SERVICES:LIBRARY:ERESOURCES;BROWN:COMMUNITY:EMPLOYEE:ADMINISTRATIVE:ALL;BROWN:COMMUNITY:LICENSE:ALL;BROWN:COMMUNITY:EMPLOYEE:ONCAMPUS;BROWN:EAB:HRDEPT:16400505;BROWN:COMMUNITY:EMPLOYEE:BENEFITS:BASE;BROWN:COMMUNITY:EMPLOYEE:STAFF_ONLY;BROWN:SERVICES:SSLVPN:GENERAL:ALL;BROWN:COMMUNITY:TRANSPORTATION:ONCAMPUS", 
+  "Shibboleth-mail": "Sample_Developer@college.edu", 
+  "Shibboleth-persistent-id": "https://sso.college.edu/idp/shibboleth!https://server.college.edu/shibboleth-sp!sk1Z9qKruvXY7JXvsq4GRb8GCUk=", 
+  "Shibboleth-sn": "Developer", 
+  "Shibboleth-title": "Library Developer", 
+  "Shibboleth-unscoped-affiliation": "member;staff"
+}
