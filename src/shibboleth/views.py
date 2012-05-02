@@ -22,7 +22,7 @@ class ShibbolethView(TemplateView):
         class based views.
         https://docs.djangoproject.com/en/dev/topics/auth/
         """
-        return super(ShibView, self).dispatch(request, *args, **kwargs)
+        return super(ShibbolethView, self).dispatch(request, *args, **kwargs)
     
     def get(self, request, **kwargs):
         """Process the request."""
