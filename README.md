@@ -8,13 +8,17 @@ Middleware for using Shibboleth with Django
 Install
 ------
 * Add bul_shib to installed apps.
+```python
 INSTALLED_APPS += (
   'bul_shib'
 )
+```
 * settings.py
+```python
 AUTHENTICATION_BACKENDS += (
   'django.contrib.auth.backends.RemoteUserBackend',
 )
+```
 
 MIDDLEWARE_CLASSES += (
   'bul_shib.middleware.BulShibRemoteUserMiddleware',
