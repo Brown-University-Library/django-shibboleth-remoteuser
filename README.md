@@ -11,8 +11,8 @@ Install
  
 Configuration
 -----
-In settings.py:
-=======
+settings.py:
+-----
  * Add shibboleth to installed apps.  
 
     ```python
@@ -49,13 +49,15 @@ In settings.py:
     ```
     
    * Login url - set this to a Shibboleth protected path.  See below for Apache configuration.
+   
    ```python
    LOGIN_URL = 'http://school.edu/shib'
    ```
  
 urls.py
-=======
+-----
 Below is only necessary if you want to activate the included sample view.
+
     ```
     urlpatterns += patterns('',
       url(r'^shib/', include('shibboleth.urls', namespace='shibboleth')),
@@ -65,7 +67,8 @@ Below is only necessary if you want to activate the included sample view.
 
 Apache configuration
 ------
- *  Protect the path to 
+ *  Protect the path to the app in the Apache configuration file.
+ 
     ```    
     <Location /app>
       AuthType shibboleth
