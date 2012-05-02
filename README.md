@@ -9,7 +9,9 @@ Configuration
 ------
  * python setup.py install
  
- * Add shibboleth to installed apps.  
+ * In settings.py :
+ 
+  * Add shibboleth to installed apps.  
 
     ```python
     INSTALLED_APPS += (
@@ -25,7 +27,7 @@ Configuration
     )
     ```
 
-   * Add this middleware
+  * In settings.py dd this middleware
    
    ```python
     MIDDLEWARE_CLASSES += (
@@ -33,7 +35,7 @@ Configuration
     )
     ```
 
-   * Map Shibboleth attributes to Django User models.  By default only the username will be pulled from the Shibboleth headers.
+  * In settings.py - map Shibboleth attributes to Django User models.  By default only the username will be pulled from the Shibboleth headers.
 
     ```python   
     SHIBBOLETH_ATTRIBUTE_MAP = {
@@ -44,14 +46,14 @@ Configuration
     }
     ```
     
-   * Login url - set this to a Shibboleth protected path.  See below for Apache configuration.
+  * Login url - set this to a Shibboleth protected path.  See below for Apache configuration.
    
    ```python
    LOGIN_URL = 'http://school.edu/shib'
    ```
  
 
-   * In urls.py add below to enable the included sample view.
+ * In urls.py add below to enable the included sample view.
 
     ```
     urlpatterns += patterns('',
@@ -60,7 +62,7 @@ Configuration
     )
     ```
 
-   * Apache configuration - protect the path to the app in the Apache configuration file.
+ * Apache configuration - protect the path to the app in the Apache configuration file.
    
     ```    
     <Location /app>
