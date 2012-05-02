@@ -5,14 +5,10 @@ Middleware for using Shibboleth with Django
 
  * Requires Django 1.3 for RemoteAuthMiddleware.
 
-Install
-------
- * pip install 
- 
 Configuration
------
-settings.py:
------
+------
+ * python setup.py install
+ 
  * Add shibboleth to installed apps.  
 
     ```python
@@ -54,9 +50,8 @@ settings.py:
    LOGIN_URL = 'http://school.edu/shib'
    ```
  
-urls.py
------
-Below is only necessary if you want to activate the included sample view.
+
+   * In urls.py add below to enable the included sample view.
 
     ```
     urlpatterns += patterns('',
@@ -65,10 +60,8 @@ Below is only necessary if you want to activate the included sample view.
     )
     ```
 
-Apache configuration
-------
- *  Protect the path to the app in the Apache configuration file.
- 
+   * Apache configuration - protect the path to the app in the Apache configuration file.
+   
     ```    
     <Location /app>
       AuthType shibboleth
