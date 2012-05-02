@@ -1,11 +1,9 @@
 django-shibboleth-remoteuser
 ============================
 
-Middleware for using Shibboleth with Django
+Middleware for using Shibboleth with Django.  Requires Django 1.3 or above for RemoteAuthMiddleware.
 
- * Requires Django 1.3 for RemoteAuthMiddleware.
-
-Configuration
+Installation Configuration
 ------
  * python setup.py install
  
@@ -55,7 +53,7 @@ Configuration
 
  * In urls.py add below to enable the included sample view.
 
-    ```
+    ```python
     urlpatterns += patterns('',
       url(r'^shib/', include('shibboleth.urls', namespace='shibboleth')),
     
