@@ -8,6 +8,11 @@ Middleware for using Shibboleth with Django
 Install
 ------
  * pip install 
+ 
+Configuration
+-----
+In settings.py:
+=======
  * Add shibboleth to installed apps.  
 
     ```python
@@ -16,38 +21,56 @@ Install
     )
     ```
 
-  * Add the following to settings.py
+  * Enable the RemoteUserBackend
+    
     ```python
     AUTHENTICATION_BACKENDS += (
       'django.contrib.auth.backends.RemoteUserBackend',
     )
     ```
 
-MIDDLEWARE_CLASSES += (
-  'shibboleth.middleware.BulShibRemoteUserMiddleware',
-)
+   * Add this middleware
+   
+   ```python
+    MIDDLEWARE_CLASSES += (
+      'shibboleth.middleware.BulShibRemoteUserMiddleware',
+    )
+    ```
 
- * Map Shibboleth attributes to Django User models.  By default
- only the username will be pulled from the Shibboleth headers.   
-SHIBBOLETH_ATTRIBUTE_MAP = {
-   "Shibboleth-mail": (True, "email"),
-   "Shibboleth-givenName": (True, "first_name"),
-   "Shibboleth-sn": (True, "last_name"),
-   "Shibboleth-mail": (True, "email"),
-}
+   * Map Shibboleth attributes to Django User models.  By default only the username will be pulled from the Shibboleth headers.
+
+    ```python   
+    SHIBBOLETH_ATTRIBUTE_MAP = {
+       "Shibboleth-mail": (True, "email"),
+       "Shibboleth-givenName": (True, "first_name"),
+       "Shibboleth-sn": (True, "last_name"),
+       "Shibboleth-mail": (True, "email"),
+    }
+    ```
+    
+   * Login url - set this to a Shibboleth protected path.  See below for Apache configuration.
+   ```python
+   LOGIN_URL = 'http://school.edu/shib'
+   ```
  
- * urls.py
-urlpatterns += patterns('',
-  url(r'^shib/', include('shibboleth.urls', namespace='shibboleth')),
-
-)
+urls.py
+=======
+Below is only necessary if you want to activate the included sample view.
+    ```
+    urlpatterns += patterns('',
+      url(r'^shib/', include('shibboleth.urls', namespace='shibboleth')),
+    
+    )
+    ```
 
 Apache configuration
 ------
- *  Path to your project and path to the shib view referenced below. This needs to be have shib configured in your Apache conf, e.g.
-<Location /app>
+ *  Protect the path to 
+    ```    
+    <Location /app>
       AuthType shibboleth
       Require shibboleth
       ShibUseHeaders On
-</Location>
+    </Location>
+    ```
 
