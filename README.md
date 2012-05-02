@@ -69,8 +69,7 @@ Installation Configuration
       ShibUseHeaders On
     </Location>
     ```
- 
-  * Optional A helper to add a {{ login_link }} template tag for routing users to the login page.
+ * Optional A helper to add a {{ login_link }} template tag for routing users to the login page.
 TEMPLATE_CONTEXT_PROCESSORS += (
   'shibboleth.context_processors.login_link',
 )
