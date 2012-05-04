@@ -3,7 +3,7 @@ Decorators to use with Shibboleth.
 """
 from django.conf import settings
 from django.contrib import auth
-from middleware import parse_attributes
+from middleware import ShibbolethRemoteUserMiddleware
 
 def login_optional(func):
   """
@@ -15,16 +15,9 @@ def login_optional(func):
     if 'django.contrib.auth.backends.RemoteUserBackend' not in settings.AUTHENTICATION_BACKENDS:
         pass
     else:
-        shib, error = parse_attributes(request.META)
-        if error == False:
-            #log the user in
-            username = shib.get('username')
-            user = auth.authenticate(remote_user=username)
-            auth.login(request, user)
-            user.set_unusable_password()
-            user.first_name = shib.get('first_name', '')
-            user.last_name = shib.get('last_name', '')
-            user.email = shib.get('email', '')
-            user.save()
+        shib = ShibbolethRemoteUserMiddleware()
+        #Proccess the request with the Shib middlemare, which will log the
+        #user in if we can.
+        proc = shib.process_request(request)
     return func(request, *args, **kwargs)
   return decorator 
