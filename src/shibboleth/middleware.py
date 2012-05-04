@@ -5,23 +5,6 @@ from django.core.exceptions import ImproperlyConfigured
 
 from app_settings import SHIB_ATTRIBUTE_MAP, SHIB_MOCK_HEADERS
 
-def parse_attributes(META):
-    """
-    From: https://github.com/russell/django-shibboleth/blob/master/django_shibboleth/utils.py
-    Pull the mapped attributes from the apache headers.
-    """
-    shib_attrs = {}
-    error = False
-    for header, attr in SHIB_ATTRIBUTE_MAP.items():
-        required, name = attr
-        value = META.get(header, None)
-        shib_attrs[name] = value
-        if not value or value == '':
-            if required:
-                error = True
-    return shib_attrs, error
-
-
 class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
     #From: http://code.djangoproject.com/svn/django/tags/releases/1.3/django/contrib/auth/middleware.py
     def process_request(self, request):
@@ -91,3 +74,20 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
         from the Shib provided attributes.  By default it does noting.
         """
         return
+    
+    
+def parse_attributes(META):
+    """
+    From: https://github.com/russell/django-shibboleth/blob/master/django_shibboleth/utils.py
+    Pull the mapped attributes from the apache headers.
+    """
+    shib_attrs = {}
+    error = False
+    for header, attr in SHIB_ATTRIBUTE_MAP.items():
+        required, name = attr
+        value = META.get(header, None)
+        shib_attrs[name] = value
+        if not value or value == '':
+            if required:
+                error = True
+    return shib_attrs, error
