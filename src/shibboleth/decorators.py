@@ -1,5 +1,6 @@
 
-from shibboleth.middleware import parse_attributes
+from django.conf import settings
+from middleware import parse_attributes
 
 def login_optional(func):
   """

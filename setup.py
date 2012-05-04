@@ -16,7 +16,7 @@ setup(
     long_description = read('README.md'),
     author = 'Ted Lawless',
     author_email = 'tlawless@brown.edu',
-
+    url = 'https://github.com/Brown-University-Library/django-shibboleth-remoteuser',
     packages = find_packages('src'),
     include_package_data = True,
     package_dir = {'': 'src'},
