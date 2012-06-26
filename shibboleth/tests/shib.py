@@ -13,7 +13,6 @@ from shibboleth.views import ShibbolethView
 SAMPLE_HEADERS = {
   "REMOTE_USER": 'devloper@school.edu',
   "Shib-Application-ID": "default", 
-  "Shib-Authentication-Instant": "2011-12-09T18:46:08.139Z", 
   "Shib-Authentication-Method": "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified", 
   "Shib-AuthnContext-Class": "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified", 
   "Shib-Identity-Provider": "https://sso.college.edu/idp/shibboleth", 
