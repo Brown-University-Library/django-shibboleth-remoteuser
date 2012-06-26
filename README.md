@@ -1,9 +1,11 @@
-django-shibboleth-remoteuser
+django-shibboleth-remoteuser 
 ============================
 
 Middleware for using Shibboleth with Django.  Requires Django 1.3 or above for RemoteAuthMiddleware.
 
-Installation Configuration
+[![Build Status](https://secure.travis-ci.org/Brown-University-Library/django-shibboleth-remoteuser.png?branch=master)](http://travis-ci.org/Brown-University-Library/django-shibboleth-remoteuser)
+
+Installation and configuration
 ------
  * ```pip install git+git://github.com/Brown-University-Library/django-shibboleth-remoteuser.git```
  
