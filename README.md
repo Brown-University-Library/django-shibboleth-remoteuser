@@ -9,14 +9,6 @@ Installation Configuration
  
  * In settings.py :
  
-  * Add shibboleth to installed apps.  
-
-    ```python
-    INSTALLED_APPS += (
-      'shibboleth'
-    )
-    ```
-
   * Enable the RemoteUserBackend
     
     ```python
@@ -33,7 +25,7 @@ Installation Configuration
     )
     ```
 
-  * In settings.py - map Shibboleth attributes to Django User models.  By default only the username will be pulled from the Shibboleth headers.
+  * Map Shibboleth attributes to Django User models.  By default only the username will be pulled from the Shibboleth headers.
 
     ```python   
     SHIBBOLETH_ATTRIBUTE_MAP = {
@@ -47,20 +39,10 @@ Installation Configuration
   * Login url - set this to a Shibboleth protected path.  See below for Apache configuration.
    
    ```python
-   LOGIN_URL = 'http://school.edu/shib'
+   LOGIN_URL = 'https://school.edu/Shibboleth.sso/Login'
    ```
- 
 
- * In urls.py add below to enable the included sample view.
-
-    ```python
-    urlpatterns += patterns('',
-      url(r'^shib/', include('shibboleth.urls', namespace='shibboleth')),
-    
-    )
-    ```
-
- * Apache configuration - protect the path to the app in the Apache configuration file.
+ * Apache configuration - make sure the shibboleth attributes are available to the app.  Could be required or just available.
    
     ```    
     <Location /app>
@@ -69,7 +51,26 @@ Installation Configuration
       ShibUseHeaders On
     </Location>
     ```
- * Optional A helper to add a {{ login_link }} template tag for routing users to the login page.
+
+  * Optional - Add shibboleth to installed apps.  
+
+    ```python
+    INSTALLED_APPS += (
+      'shibboleth'
+    )
+    ```
+
+ * Optional
+  * In urls.py add below to enable the included sample view.  This will just echo back the parsed user attributes.
+
+    ```python
+    urlpatterns += patterns('',
+      url(r'^shib/', include('shibboleth.urls', namespace='shibboleth')),
+    
+    )
+    ```
+
+  * A helper to add a {{ login_link }} template tag for routing users to the login page.
    ```
     TEMPLATE_CONTEXT_PROCESSORS += (
        'shibboleth.context_processors.login_link',
