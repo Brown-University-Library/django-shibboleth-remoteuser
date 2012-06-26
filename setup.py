@@ -16,6 +16,10 @@ from distutils.command.install import INSTALL_SCHEMES
 import os
 import sys
 
+
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
 class osx_install_data(install_data):
     # On MacOS, the platform-specific lib dir is /System/Library/Framework/Python/.../
     # which is wrong. Python 2.5 supplied with MacOS 10.5 has an Apple-specific fix
@@ -89,7 +93,6 @@ setup(
       packages=packages,
       cmdclass = cmdclasses,
       data_files=data_files,
-      include_package_data=True,
 )
 
 
