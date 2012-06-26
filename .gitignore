@@ -2,7 +2,7 @@
 
 .project
 .pydevproject
-
+.settings/
 # Packages
 *.egg
 *.egg-info
