@@ -8,22 +8,6 @@ from app_settings import SHIB_ATTRIBUTE_MAP, SHIB_MOCK_HEADERS
 class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
     #From: http://code.djangoproject.com/svn/django/tags/releases/1.3/django/contrib/auth/middleware.py
     def process_request(self, request):
-        #Mock up the request header if we are using the development server.
-        #For dev server testing.
-        if (settings.DEBUG) and (SHIB_MOCK_HEADERS):
-            #clear existing sessions
-            from django.contrib.sessions.models import Session
-            Session.objects.all().delete()
-            #Open test shib response
-            import os
-            import sys
-            import json
-            base_dir = os.path.dirname(os.path.abspath(__file__)) + '/'
-            test_shib = json.load(open(os.path.join(base_dir, 'tests/data/shib_response.json')))
-            #Update the request header with the targeted shib attribues.
-            request.META.update(test_shib)
-            request.META[self.header] = parse_attributes(test_shib)[0]['username']
-                
         # AuthenticationMiddleware is required so that request.user exists.
         if not hasattr(request, 'user'):
             raise ImproperlyConfigured(
