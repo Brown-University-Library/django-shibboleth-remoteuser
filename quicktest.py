@@ -7,7 +7,6 @@ http://datadesk.latimes.com/posts/2012/06/test-your-django-app-with-travisci/
 
 import os
 import sys
-import argparse
 from django.conf import settings
 
 
@@ -96,10 +95,5 @@ if __name__ == '__main__':
         $ python quicktest.py app1 app2
     
     """
-    parser = argparse.ArgumentParser(
-        usage="[args]",
-        description="Run Django tests on the provided applications."
-    )
-    parser.add_argument('apps', nargs='+', type=str)
-    args = parser.parse_args()
-    QuickDjangoTest(*args.apps)
+    apps = sys.argv[1:]
+    QuickDjangoTest(*apps)
