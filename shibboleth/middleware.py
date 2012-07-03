@@ -48,6 +48,7 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             user.last_name = shib_meta.get('last_name', '')
             user.email = shib_meta.get('email', '')
             user.save()
+            request.session['shib'] = shib_meta
             #call make profile.
             self.make_profile(user, shib_meta)
             
