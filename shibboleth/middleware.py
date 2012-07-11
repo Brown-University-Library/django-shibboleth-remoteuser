@@ -3,7 +3,7 @@ from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
 
-from app_settings import SHIB_ATTRIBUTE_MAP, SHIB_MOCK_HEADERS
+#from app_settings import SHIB_ATTRIBUTE_MAP, SHIB_MOCK_HEADERS
 
 class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
     #From: http://code.djangoproject.com/svn/django/tags/releases/1.3/django/contrib/auth/middleware.py
@@ -29,6 +29,15 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
         if request.user.is_authenticated():
             if request.user.username == self.clean_username(username, request):
                 return
+        
+        #Make sure we have all required Shiboleth elements before proceeding.
+        shib_meta, error = parse_attributes(request.META)
+        #Add parsed attributes to the session.
+        request.session['shib'] = shib_meta
+        if error:
+            raise ShibbolethValidationError("All required Shibboleth elements"
+                                            " not found.  %s" % shib_meta)
+        
         # We are seeing this user for the first time in this session, attempt
         # to authenticate the user.
         user = auth.authenticate(remote_user=username)
@@ -37,18 +46,11 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             # by logging the user in.
             request.user = user
             auth.login(request, user)
-            shib_meta, error = parse_attributes(request.META)
-            if error:
-                raise ImproperlyConfigured(
-                "All required Shibboleth attributes weren't found in the request."
-                "Check app_settings to see the required elements."
-                )
             user.set_unusable_password()
             user.first_name = shib_meta.get('first_name', '')
             user.last_name = shib_meta.get('last_name', '')
             user.email = shib_meta.get('email', '')
             user.save()
-            request.session['shib'] = shib_meta
             #call make profile.
             self.make_profile(user, shib_meta)
             
@@ -68,7 +70,7 @@ def parse_attributes(META):
     """
     shib_attrs = {}
     error = False
-    for header, attr in SHIB_ATTRIBUTE_MAP.items():
+    for header, attr in settings.SHIBBOLETH_ATTRIBUTE_MAP.items():
         required, name = attr
         value = META.get(header, None)
         shib_attrs[name] = value
@@ -76,3 +78,7 @@ def parse_attributes(META):
             if required:
                 error = True
     return shib_attrs, error
+
+
+class ShibbolethValidationError(Exception):
+    pass
