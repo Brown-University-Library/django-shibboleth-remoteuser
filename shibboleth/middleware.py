@@ -1,12 +1,11 @@
-from django.conf import settings
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
 
-#from app_settings import SHIB_ATTRIBUTE_MAP, SHIB_MOCK_HEADERS
+from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP
 
 class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
-    #From: http://code.djangoproject.com/svn/django/tags/releases/1.3/django/contrib/auth/middleware.py
+    # From: http://code.djangoproject.com/svn/django/tags/releases/1.3/django/contrib/auth/middleware.py
     def process_request(self, request):
         # AuthenticationMiddleware is required so that request.user exists.
         if not hasattr(request, 'user'):
@@ -29,15 +28,15 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
         if request.user.is_authenticated():
             if request.user.username == self.clean_username(username, request):
                 return
-        
-        #Make sure we have all required Shiboleth elements before proceeding.
+
+        # Make sure we have all required Shiboleth elements before proceeding.
         shib_meta, error = parse_attributes(request.META)
-        #Add parsed attributes to the session.
+        # Add parsed attributes to the session.
         request.session['shib'] = shib_meta
         if error:
             raise ShibbolethValidationError("All required Shibboleth elements"
                                             " not found.  %s" % shib_meta)
-        
+
         # We are seeing this user for the first time in this session, attempt
         # to authenticate the user.
         user = auth.authenticate(remote_user=username)
@@ -51,9 +50,9 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             user.last_name = shib_meta.get('last_name', '')
             user.email = shib_meta.get('email', '')
             user.save()
-            #call make profile.
+            # call make profile.
             self.make_profile(user, shib_meta)
-            
+
     def make_profile(self, user, shib_meta):
         """
         This is here as a stub to allow subclassing of ShibbolethRemoteUserMiddleware
@@ -61,8 +60,8 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
         from the Shib provided attributes.  By default it does noting.
         """
         return
-    
-    
+
+
 def parse_attributes(META):
     """
     From: https://github.com/russell/django-shibboleth/blob/master/django_shibboleth/utils.py
@@ -70,7 +69,7 @@ def parse_attributes(META):
     """
     shib_attrs = {}
     error = False
-    for header, attr in settings.SHIBBOLETH_ATTRIBUTE_MAP.items():
+    for header, attr in SHIB_ATTRIBUTE_MAP.items():
         required, name = attr
         value = META.get(header, None)
         shib_attrs[name] = value
