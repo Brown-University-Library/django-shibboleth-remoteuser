@@ -23,7 +23,10 @@ Installation and configuration
     )
     ```
 
-  * Add the Django Shibboleth middleware.  You must add the django.contrib.auth.middleware.ShibbolethRemoteUserMiddleware to the MIDDLEWARE_CLASSES setting after the django.contrib.auth.middleware.AuthenticationMiddleware.  For example.  
+  * Add the Django Shibboleth middleware.
+    You must add the django.contrib.auth.middleware.ShibbolethRemoteUserMiddleware to the MIDDLEWARE_CLASSES setting after the django.contrib.auth.middleware.AuthenticationMiddleware.
+    For example:
+
    ```python
     MIDDLEWARE_CLASSES = (
     ...
