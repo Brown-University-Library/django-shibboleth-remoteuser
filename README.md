@@ -7,7 +7,11 @@ Middleware for using Shibboleth with Django.  Requires Django 1.3 or above for R
 
 Installation and configuration
 ------
- * ```pip install git+git://github.com/Brown-University-Library/django-shibboleth-remoteuser.git```
+ * Either checkout and run ```python setup.py install``` or install directly from Github with pip:
+
+   ```
+   pip install git+git://github.com/Brown-University-Library/django-shibboleth-remoteuser.git
+   ```
  
  * In settings.py :
  
@@ -19,7 +23,7 @@ Installation and configuration
     )
     ```
 
-  * Add this middleware
+  * Add the Django Shibboleth middleware
    
    ```python
     MIDDLEWARE_CLASSES += (
@@ -28,6 +32,7 @@ Installation and configuration
     ```
 
   * Map Shibboleth attributes to Django User models.  By default only the username will be pulled from the Shibboleth headers.
+If other attributes are available they will be used to populate the Django User object.  
 
     ```python   
     SHIBBOLETH_ATTRIBUTE_MAP = {
@@ -38,7 +43,7 @@ Installation and configuration
     }
     ```
     
-  * Login url - set this to a Shibboleth protected path.  See below for Apache configuration.
+  * Login url - set this to a Shibboleth protected path.  
    
    ```python
    LOGIN_URL = 'https://school.edu/Shibboleth.sso/Login'
@@ -54,7 +59,9 @@ Installation and configuration
     </Location>
     ```
 
-  * Optional - Add shibboleth to installed apps.  
+Optional
+--------
+  * Add shibboleth to installed apps.  
 
     ```python
     INSTALLED_APPS += (
@@ -62,17 +69,15 @@ Installation and configuration
     )
     ```
 
- * Optional
-  * In urls.py add below to enable the included sample view.  This will just echo back the parsed user attributes.
+ * Add below to urls.py to enable the included sample view.  This view just echos back the parsed user attributes, which can be helpful for testing.
 
     ```python
     urlpatterns += patterns('',
       url(r'^shib/', include('shibboleth.urls', namespace='shibboleth')),
-    
     )
     ```
 
-  * A helper to add a {{ login_link }} template tag for routing users to the login page.
+ * A template tag is included which will allow you to place {{ login_link }} in your templates for routing users to the login page.
    ```
     TEMPLATE_CONTEXT_PROCESSORS += (
        'shibboleth.context_processors.login_link',
