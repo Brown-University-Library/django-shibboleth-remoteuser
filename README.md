@@ -86,8 +86,9 @@ Optional
     ```
 
  * A template tag is included which will allow you to place {{ login_link }} in your templates for routing users to the login page.
-   ```
+   
+   ```python
     TEMPLATE_CONTEXT_PROCESSORS += (
        'shibboleth.context_processors.login_link',
-    )   
+    )
    ```
