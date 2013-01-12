@@ -36,12 +36,15 @@ Installation and configuration
     )
     ```
 
-  * Map Shibboleth attributes to Django User models.  By default only the username will be pulled from the Shibboleth headers.
-If other attributes are available they will be used to populate the Django User object.  
+  * Map Shibboleth attributes to Django User models.  A username is required.  
+    If first_name, last_name, email are available as Shibboleth attributes they will be used to populate the Django User object.  
+    The tuple of (True, "username") specifies that username is required.
+    If it is not found in the parsed Shibboleth headers, an exception will be raised.
+    To mak a Shibboleth attribute specify it like this (False, "optional_attribute).  
 
     ```python   
     SHIBBOLETH_ATTRIBUTE_MAP = {
-       "Shibboleth-mail": (True, "email"),
+       "Shibboleth-user": (True, "username"),,
        "Shibboleth-givenName": (True, "first_name"),
        "Shibboleth-sn": (True, "last_name"),
        "Shibboleth-mail": (True, "email"),
