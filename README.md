@@ -18,16 +18,18 @@ Installation and configuration
   * Enable the RemoteUserBackend
     
     ```python
-    AUTHENTICATION_BACKENDS += (
+    AUTHENTICATION_BACKENDS = (
       'django.contrib.auth.backends.RemoteUserBackend',
     )
     ```
 
-  * Add the Django Shibboleth middleware
-   
+  * Add the Django Shibboleth middleware.  You must add the django.contrib.auth.middleware.ShibbolethRemoteUserMiddleware to the MIDDLEWARE_CLASSES setting after the django.contrib.auth.middleware.AuthenticationMiddleware.
    ```python
-    MIDDLEWARE_CLASSES += (
-      'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
+    MIDDLEWARE_CLASSES = (
+    ...
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
+    ...
     )
     ```
 
