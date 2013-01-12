@@ -65,7 +65,7 @@ Optional
 
     ```python
     INSTALLED_APPS += (
-      'shibboleth'
+      ('shibboleth')
     )
     ```
 
