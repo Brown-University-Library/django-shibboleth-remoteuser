@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
+
+import os
+
 from django.conf import settings
 from django.utils import unittest
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.client import Client
-
-import os
-from pprint import pprint
 
 from shibboleth.views import ShibbolethView
 
