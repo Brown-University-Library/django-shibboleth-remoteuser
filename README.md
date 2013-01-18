@@ -40,7 +40,7 @@ Installation and configuration
     If first_name, last_name, email are available as Shibboleth attributes they will be used to populate the Django User object.  
     The tuple of (True, "username") specifies that username is required.
     If it is not found in the parsed Shibboleth headers, an exception will be raised.
-    To mak a Shibboleth attribute specify it like this (False, "optional_attribute).  
+    To make a Shibboleth attribute specify it like this (False, "optional_attribute).  
 
     ```python   
     SHIBBOLETH_ATTRIBUTE_MAP = {
@@ -57,7 +57,7 @@ Installation and configuration
    LOGIN_URL = 'https://school.edu/Shibboleth.sso/Login'
    ```
 
- * Apache configuration - make sure the shibboleth attributes are available to the app.  Could be required or just available.
+ * Apache configuration - make sure the shibboleth attributes are available to the app. 
    
     ```    
     <Location /app>
@@ -85,7 +85,7 @@ Optional
     )
     ```
 
- * A template tag is included which will allow you to place {{ login_link }} in your templates for routing users to the login page.
+ * A template tag is included which will allow you to place {{ login_link }} in your templates for routing users to the login page.  To activate add the following to settings.py:
    
    ```python
     TEMPLATE_CONTEXT_PROCESSORS += (
