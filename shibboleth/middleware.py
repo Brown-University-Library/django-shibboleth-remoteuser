@@ -2,9 +2,27 @@ from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
 
-from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP
+from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, LOGOUT_SESSION_KEY
 
 class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
+
+    def parse_attributes(self, request):
+        """
+        From: https://github.com/russell/django-shibboleth/blob/master/django_shibboleth/utils.py
+        Pull the mapped attributes from the apache headers.
+        """
+        shib_attrs = {}
+        error = False
+        meta = request.META
+        for header, attr in SHIB_ATTRIBUTE_MAP.items():
+            required, name = attr
+            value = meta.get(header, None)
+            shib_attrs[name] = value
+            if not value or value == '':
+                if required:
+                    error = True
+        return shib_attrs, error
+
     # From: http://code.djangoproject.com/svn/django/tags/releases/1.3/django/contrib/auth/middleware.py
     def process_request(self, request):
         # AuthenticationMiddleware is required so that request.user exists.
@@ -15,6 +33,17 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
                 " MIDDLEWARE_CLASSES setting to insert"
                 " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
                 " before the RemoteUserMiddleware class.")
+
+        #To support logout.  If this variable is True, do not 
+        #authenticate user and return now.
+        if request.session.get(LOGOUT_SESSION_KEY) == True:
+            return 
+        else:
+            #Delete the shib reauth session key if present.
+            try:
+                del request.session[LOGOUT_SESSION_KEY]
+            except KeyError:
+                pass
         try:
             username = request.META[self.header]
         except KeyError:
@@ -30,7 +59,7 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
                 return
 
         # Make sure we have all required Shiboleth elements before proceeding.
-        shib_meta, error = parse_attributes(request.META)
+        shib_meta, error = self.parse_attributes(request)
         # Add parsed attributes to the session.
         request.session['shib'] = shib_meta
         if error:
@@ -48,6 +77,7 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             user.set_unusable_password()
             user.first_name = shib_meta.get('first_name', '')
             user.last_name = shib_meta.get('last_name', '')
+            #import ipdb; ipdb.set_trace()
             user.email = shib_meta.get('email', '')
             user.save()
             # call make profile.
@@ -60,24 +90,6 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
         from the Shib provided attributes.  By default it does noting.
         """
         return
-
-
-def parse_attributes(META):
-    """
-    From: https://github.com/russell/django-shibboleth/blob/master/django_shibboleth/utils.py
-    Pull the mapped attributes from the apache headers.
-    """
-    shib_attrs = {}
-    error = False
-    for header, attr in SHIB_ATTRIBUTE_MAP.items():
-        required, name = attr
-        value = META.get(header, None)
-        shib_attrs[name] = value
-        if not value or value == '':
-            if required:
-                error = True
-    return shib_attrs, error
-
 
 class ShibbolethValidationError(Exception):
     pass

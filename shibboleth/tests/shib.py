@@ -8,8 +8,6 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.client import Client
 
-from shibboleth.views import ShibbolethView
-
 SAMPLE_HEADERS = {
   "REMOTE_USER": 'devloper@school.edu',
   "Shib-Application-ID": "default", 
@@ -34,14 +32,6 @@ SAMPLE_HEADERS = {
   "Shibboleth-unscoped-affiliation": "member;staff"
 }
 
-settings.AUTHENTICATION_BACKENDS += (
-    'django.contrib.auth.backends.RemoteUserBackend',
-)
-
-settings.MIDDLEWARE_CLASSES += (
-    'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
-)
-
 settings.SHIBBOLETH_ATTRIBUTE_MAP = {
    "Shib-Identity-Provider": (True, "idp"),
    "Shibboleth-mail": (True, "email"),
@@ -55,7 +45,21 @@ settings.SHIBBOLETH_ATTRIBUTE_MAP = {
    "Shibboleth-schoolBarCode": (False, "barcode")
 }
 
+
+settings.AUTHENTICATION_BACKENDS += (
+    'django.contrib.auth.backends.RemoteUserBackend',
+)
+
+settings.MIDDLEWARE_CLASSES += (
+    'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
+)
+
 settings.ROOT_URLCONF = 'shibboleth.urls'
+
+settings.SHIBBOLETH_LOGOUT_URL = 'https://sso.school.edu/logout?next=%s'
+settings.SHIBBOLETH_LOGOUT_REDIRECT_URL = 'http://school.edu/'
+
+from shibboleth.views import ShibbolethView
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
@@ -82,4 +86,31 @@ class AttributesTest(unittest.TestCase):
         self.assertEqual(user.email, 'Sample_Developer@school.edu')
         self.assertTrue(user.is_authenticated())
         self.assertFalse(user.is_anonymous())
+
+class LogoutTest(unittest.TestCase):   
+    def setUp(self):
+        self.c = Client()
+             
+    def test_logout(self):
+        """
+        """
+        from shibboleth import app_settings
+        #Login
+        login = self.c.get('/', **SAMPLE_HEADERS)
+        self.assertEqual(login.status_code, 200)
+        #Logout
+        logout = self.c.get('/logout/', **SAMPLE_HEADERS)
+        self.assertEqual(logout.status_code, 302)
+        #Ensure redirect happened.
+        self.assertEqual(
+            logout['Location'],
+            'https://sso.school.edu/logout?next=http://school.edu/'
+        )
+        #Check to see if the session has the force logout key.
+        self.assertTrue(self.c.session.get(app_settings.LOGOUT_SESSION_KEY))
+        #Load root url to see if user is in fact logged out.
+        resp = self.c.get('/', **SAMPLE_HEADERS)
+        self.assertEqual(resp.status_code, 302)
+        #Make sure the context is empty.
+        self.assertEqual(resp.context, None)
         
