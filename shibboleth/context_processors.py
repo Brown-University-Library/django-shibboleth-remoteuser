@@ -17,8 +17,13 @@ def logout_link(request, *args):
     and uses the 'target' url parameter.
     e.g: https://school.edu/Shibboleth.sso/Login
     """
-    from app_settings import LOGOUT_URL
+    from app_settings import LOGOUT_URL, LOGOUT_REDIRECT_URL
     from urllib import quote
-    next_path = quote(request.get_full_path())
-    ll = "%s?target=%s" % (LOGOUT_URL, next_path)
+    #Use the app setting logout redirect url if present
+    #else bring the user back to the current page.
+    if LOGOUT_REDIRECT_URL:
+        next_path = LOGOUT_REDIRECT_URL
+    else:
+        next_path = request.get_full_path()
+    ll = "%s?target=%s" % (LOGOUT_URL, quote(next_path))
     return { 'logout_link': ll }
