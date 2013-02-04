@@ -12,6 +12,12 @@ from django.views.generic import TemplateView
 #Logout settings.
 from shibboleth.app_settings import LOGOUT_URL, LOGOUT_REDIRECT_URL, LOGOUT_SESSION_KEY
 
+#logging
+from django.utils.log import dictConfig
+import logging
+dictConfig(settings.LOGGING)
+alog = logging.getLogger('access')
+
 class ShibbolethView(TemplateView):
     """
     This is here to offer a Shib protected page that we can
@@ -59,16 +65,6 @@ class ShibbolethLogoutView(TemplateView):
         self.request.session[LOGOUT_SESSION_KEY] = True
         return redirect(self.get_shib_logout_path())
 
-    def post(self, *args, **kwargs):
-        if self.request.user.is_authenticated():
-            auth.logout(self.request)
-        #Log the user out.
-        auth.logout(self.request)
-        #Set session key that middleware will use to force 
-        #Shibboleth reauthentication.
-        self.request.session[LOGOUT_SESSION_KEY] = True
-        return redirect(self.get_shib_logout_path())
-
     def get_redirect_field_name(self):
         return self.redirect_field_name
 
@@ -85,6 +81,28 @@ class ShibbolethLogoutView(TemplateView):
         return next_url
 
     def get_shib_logout_path(self):
-        next = self.get_redirect_url()
-        logout_path = LOGOUT_URL % next
+        #next = self.get_redirect_url()
+        logout_path = LOGOUT_URL % self.request.GET.get('target')
+        logout_path = LOGOUT_URL % 'http://worfdev.services.brown.edu/easyarticle/'
         return logout_path
+
+
+class ShibbolethLoginView(TemplateView):
+    """
+    Pass the user to the Shibboleth logout page.
+    Some code borrowed from:
+    https://github.com/stefanfoulis/django-class-based-auth-views.
+    """
+    redirect_field_name = "target"
+
+    def get(self, *args, **kwargs):
+        from urllib import quote
+        if self.request.user.is_authenticated():
+            return redirect(next)
+        #Set session key that middleware will use to force 
+        #Shibboleth reauthentication.
+        self.request.session[LOGOUT_SESSION_KEY] = False
+        login = settings.LOGIN_REDIRECT_URL + '?target=%s' % self.request.GET.get(self.redirect_field_name)
+        alog.warn(login)
+        return redirect(login)
+
