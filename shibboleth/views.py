@@ -12,12 +12,6 @@ from django.views.generic import TemplateView
 #Logout settings.
 from shibboleth.app_settings import LOGOUT_URL, LOGOUT_REDIRECT_URL, LOGOUT_SESSION_KEY
 
-#logging
-from django.utils.log import dictConfig
-import logging
-dictConfig(settings.LOGGING)
-alog = logging.getLogger('access')
-
 class ShibbolethView(TemplateView):
     """
     This is here to offer a Shib protected page that we can
@@ -104,10 +98,8 @@ class ShibbolethLoginView(TemplateView):
         from urllib import quote
         if self.request.user.is_authenticated():
             return redirect(next)
-        #Set session key that middleware will use to force 
-        #Shibboleth reauthentication.
+        #Remove session value that is forcing Shibboleth reauthentication.
         self.request.session[LOGOUT_SESSION_KEY] = False
         login = settings.LOGIN_REDIRECT_URL + '?target=%s' % self.request.GET.get(self.redirect_field_name)
-        alog.warn(login)
         return redirect(login)
 
