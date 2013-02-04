@@ -81,9 +81,14 @@ class ShibbolethLogoutView(TemplateView):
         return next_url
 
     def get_shib_logout_path(self):
-        #next = self.get_redirect_url()
-        logout_path = LOGOUT_URL % self.request.GET.get('target')
-        logout_path = LOGOUT_URL % 'http://worfdev.services.brown.edu/easyarticle/'
+        """
+        This should pull from the arguments, if they exist, otherwise
+        fall back to the settings logout.
+        """
+        next = self.request.GET.get('target')
+        if next is None:
+            next = LOGOUT_REDIRECT_URL
+        logout_path = LOGOUT_URL % next
         return logout_path
 
 
