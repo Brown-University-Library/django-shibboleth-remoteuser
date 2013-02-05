@@ -96,8 +96,8 @@ class ShibbolethLoginView(TemplateView):
 
     def get(self, *args, **kwargs):
         from urllib import quote
-        if self.request.user.is_authenticated():
-            return redirect(next)
+        #if self.request.user.is_authenticated():
+        #    return redirect(next)
         #Remove session value that is forcing Shibboleth reauthentication.
         self.request.session[LOGOUT_SESSION_KEY] = False
         login = settings.LOGIN_REDIRECT_URL + '?target=%s' % self.request.GET.get(self.redirect_field_name)
