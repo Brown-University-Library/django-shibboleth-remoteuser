@@ -5,7 +5,10 @@ from django.core.exceptions import ImproperlyConfigured
 from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, LOGOUT_SESSION_KEY
 
 class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
-
+    """
+    Authentication Middleware for use with Shibboleth.  Uses the recommended pattern 
+    for remote authentication from: http://code.djangoproject.com/svn/django/tags/releases/1.3/django/contrib/auth/middleware.py
+    """
     def parse_attributes(self, request):
         """
         From: https://github.com/russell/django-shibboleth/blob/master/django_shibboleth/utils.py
@@ -23,7 +26,6 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
                     error = True
         return shib_attrs, error
 
-    # From: http://code.djangoproject.com/svn/django/tags/releases/1.3/django/contrib/auth/middleware.py
     def process_request(self, request):
         # AuthenticationMiddleware is required so that request.user exists.
         if not hasattr(request, 'user'):
@@ -40,10 +42,8 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             return 
         else:
             #Delete the shib reauth session key if present.
-            try:
-                del request.session[LOGOUT_SESSION_KEY]
-            except KeyError:
-                pass
+	    request.session.pop(LOGOUT_SESSION_KEY, None)
+	#Locate the remote user header.  
         try:
             username = request.META[self.header]
         except KeyError:
