@@ -9,23 +9,6 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
     Authentication Middleware for use with Shibboleth.  Uses the recommended pattern 
     for remote authentication from: http://code.djangoproject.com/svn/django/tags/releases/1.3/django/contrib/auth/middleware.py
     """
-    def parse_attributes(self, request):
-        """
-        From: https://github.com/russell/django-shibboleth/blob/master/django_shibboleth/utils.py
-        Pull the mapped attributes from the apache headers.
-        """
-        shib_attrs = {}
-        error = False
-        meta = request.META
-        for header, attr in SHIB_ATTRIBUTE_MAP.items():
-            required, name = attr
-            value = meta.get(header, None)
-            shib_attrs[name] = value
-            if not value or value == '':
-                if required:
-                    error = True
-        return shib_attrs, error
-
     def process_request(self, request):
         # AuthenticationMiddleware is required so that request.user exists.
         if not hasattr(request, 'user'):
@@ -42,8 +25,9 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             return 
         else:
             #Delete the shib reauth session key if present.
-	    request.session.pop(LOGOUT_SESSION_KEY, None)
-	#Locate the remote user header.  
+	        request.session.pop(LOGOUT_SESSION_KEY, None)
+	   
+        #Locate the remote user header.  
         try:
             username = request.META[self.header]
         except KeyError:
@@ -90,6 +74,24 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
         from the Shib provided attributes.  By default it does noting.
         """
         return
+    
+    def parse_attributes(self, request):
+        """
+        Parse the incoming Shibboleth attributes. 
+        From: https://github.com/russell/django-shibboleth/blob/master/django_shibboleth/utils.py
+        Pull the mapped attributes from the apache headers.
+        """
+        shib_attrs = {}
+        error = False
+        meta = request.META
+        for header, attr in SHIB_ATTRIBUTE_MAP.items():
+            required, name = attr
+            value = meta.get(header, None)
+            shib_attrs[name] = value
+            if not value or value == '':
+                if required:
+                    error = True
+        return shib_attrs, error
 
 class ShibbolethValidationError(Exception):
     pass
