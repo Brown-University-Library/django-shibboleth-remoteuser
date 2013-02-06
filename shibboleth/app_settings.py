@@ -20,8 +20,10 @@ if not LOGIN_URL:
 #This should look like: https://sso.school.edu/idp/logout.jsp?return=%s
 #The return url variable will be replaced in the LogoutView.
 LOGOUT_URL = getattr(settings, 'SHIBBOLETH_LOGOUT_URL', None)
+#LOGOUT_REDIRECT_URL specifies a default logout page that will always be used when
+#users logout from Shibboleth.
 LOGOUT_REDIRECT_URL = getattr(settings, 'SHIBBOLETH_LOGOUT_REDIRECT_URL', None)
 #Name of key.  Probably no need to change this.  
-LOGOUT_SESSION_KEY = 'shib_force_reauth'
+LOGOUT_SESSION_KEY = getattr(settings, 'SHIBBOLETH_FORCE_REAUTH_SESSION_KEY', 'shib_force_reauth')
 
 
