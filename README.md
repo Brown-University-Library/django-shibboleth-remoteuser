@@ -10,7 +10,7 @@ Installation and configuration
  * Either checkout and run ```python setup.py install``` or install directly from Github with pip:
 
    ```
-   pip install git+git://github.com/Brown-University-Library/django-shibboleth-remoteuser.git
+   pip install git+https://github.com/Brown-University-Library/django-shibboleth-remoteuser.git
    ```
  
  * In settings.py :
