@@ -7,8 +7,11 @@ from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, LOGOUT_SESSION_KEY
 class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
     """
     Authentication Middleware for use with Shibboleth.  Uses the recommended pattern
-    for remote authentication from: http://code.djangoproject.com/svn/django/tags/releases/1.3/django/contrib/auth/middleware.py
+    for remote authentication from: https://github.com/django/django/blob/1.5c2/django/contrib/auth/middleware.py#L21
     """
+    # Name of request header to grab username from.
+    header = "REMOTE_USER"
+
     def process_request(self, request):
         # AuthenticationMiddleware is required so that request.user exists.
         if not hasattr(request, 'user'):
@@ -42,7 +45,7 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             if request.user.username == self.clean_username(username, request):
                 return
 
-        # Make sure we have all required Shiboleth elements before proceeding.
+        # Make sure we have all required Shibboleth elements before proceeding.
         shib_meta, error = self.parse_attributes(request)
         # Add parsed attributes to the session.
         request.session['shib'] = shib_meta
@@ -58,22 +61,21 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             # by logging the user in.
             request.user = user
             auth.login(request, user)
-            user.set_unusable_password()
-            user.first_name = shib_meta.get('first_name', '')
-            user.last_name = shib_meta.get('last_name', '')
-            #import ipdb; ipdb.set_trace()
-            user.email = shib_meta.get('email', '')
-            user.save()
-            # call make profile.
-            self.make_profile(user, shib_meta)
+            self.after_login(request, user)
 
-    def make_profile(self, user, shib_meta):
+    def after_login(self, request, user):
         """
-        This is here as a stub to allow subclassing of ShibbolethRemoteUserMiddleware
-        to include a make_profile method that will create a Django user profile
-        from the Shib provided attributes.  By default it does noting.
+        Called after user a new user session is created.
         """
-        return
+        pass
+
+    def create_user(self, request, user):
+        shib_meta = request.session['shib']
+        user.set_unusable_password()
+        user.first_name = shib_meta.get('first_name', '')
+        user.last_name = shib_meta.get('last_name', '')
+        user.email = shib_meta.get('email', '')
+        user.save()
 
     def parse_attributes(self, request):
         """
