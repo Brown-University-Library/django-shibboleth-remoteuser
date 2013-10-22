@@ -4,8 +4,6 @@ import os
 
 from django.conf import settings
 from django.utils import unittest
-from django.test import TestCase
-from django.test.client import RequestFactory
 from django.test.client import Client
 
 SAMPLE_HEADERS = {
@@ -51,7 +49,7 @@ settings.AUTHENTICATION_BACKENDS += (
 )
 
 settings.MIDDLEWARE_CLASSES += (
-    'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
+    'shibboleth.tests.middleware.ShibTestMiddleware',
 )
 
 settings.ROOT_URLCONF = 'shibboleth.urls'
