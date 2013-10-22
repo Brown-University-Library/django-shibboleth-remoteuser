@@ -1,5 +1,5 @@
 """
-Adapted from LA Times datadesk credit to Ben Welsh. 
+Adapted from LA Times datadesk credit to Ben Welsh.
 
 http://datadesk.latimes.com/posts/2012/06/test-your-django-app-with-travisci/
 
@@ -13,12 +13,12 @@ from django.conf import settings
 class QuickDjangoTest(object):
     """
     A quick way to run the Django test suite without a fully-configured project.
-    
+
     Example usage:
-    
+
         >>> QuickDjangoTest('app1', 'app2')
-    
-    Based on a script published by Lukasz Dziedzia at: 
+
+    Based on a script published by Lukasz Dziedzia at:
     http://stackoverflow.com/questions/3841725/how-to-launch-tests-for-django-reusable-app
     """
     DIRNAME = os.path.dirname(__file__)
@@ -28,7 +28,7 @@ class QuickDjangoTest(object):
         'django.contrib.sessions',
         'django.contrib.admin',
     )
-    
+
     def __init__(self, *args, **kwargs):
         self.apps = args
         # Get the version of the test suite
@@ -38,7 +38,7 @@ class QuickDjangoTest(object):
             self._new_tests()
         else:
             self._old_tests()
-    
+
     def get_test_version(self):
         """
         Figure out which version of Django's test suite we have to play with.
@@ -48,7 +48,7 @@ class QuickDjangoTest(object):
             return 'new'
         else:
             return 'old'
-    
+
     def _old_tests(self):
         """
         Fire up the Django test suite from before version 1.2
@@ -62,7 +62,7 @@ class QuickDjangoTest(object):
         failures = run_tests(self.apps, verbosity=1)
         if failures:
             sys.exit(failures)
-    
+
     def _new_tests(self):
         """
         Fire up the Django test suite developed for version 1.2
@@ -90,11 +90,11 @@ class QuickDjangoTest(object):
 if __name__ == '__main__':
     """
     What do when the user hits this file from the shell.
-    
+
     Example usage:
-    
+
         $ python quicktest.py app1 app2
-    
+
     """
     apps = sys.argv[1:]
     QuickDjangoTest(*apps)
