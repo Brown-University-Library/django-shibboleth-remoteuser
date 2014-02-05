@@ -69,7 +69,7 @@ Installation and configuration
 
 Optional
 --------
-  * Add shibboleth to installed apps.  
+ * Add shibboleth to installed apps.  
 
     ```python
     INSTALLED_APPS += (
@@ -85,10 +85,13 @@ Optional
     )
     ```
 
- * A template tag is included which will allow you to place {{ login_link }} in your templates for routing users to the login page.  To activate add the following to settings.py:
+ * Template tags are included which will allow you to place {{ login_link }} or {{ logout_link }} in your templates for routing users to the login or logout page.  To activate add the following to settings.py.
    
    ```python
     TEMPLATE_CONTEXT_PROCESSORS += (
        'shibboleth.context_processors.login_link',
+       'shibboleth.context_processors.logout_link'
     )
    ```
+
+ 
