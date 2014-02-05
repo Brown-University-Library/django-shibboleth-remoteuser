@@ -1,4 +1,9 @@
-from django.conf.urls.defaults import *
+from distutils.version import StrictVersion
+import django
+if StrictVersion(django.get_version()) >= StrictVersion('1.6'):
+   from django.conf.urls import patterns, url, include
+else:
+   from django.conf.urls.defaults import *
 
 from views import ShibbolethView, ShibbolethLogoutView, ShibbolethLoginView
 
