@@ -12,7 +12,7 @@ def login_optional(func):
   """
   def decorator(request,*args, **kwargs):
     #Do nothing if the remoteuser backend isn't activated
-    if 'django.contrib.auth.backends.RemoteUserBackend' not in settings.AUTHENTICATION_BACKENDS:
+    if 'shibboleth.backends.ShibbolethRemoteUserBackend' not in settings.AUTHENTICATION_BACKENDS:
         pass
     else:
         shib = ShibbolethRemoteUserMiddleware()
