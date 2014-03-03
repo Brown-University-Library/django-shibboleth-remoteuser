@@ -52,17 +52,13 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
 
         # We are seeing this user for the first time in this session, attempt
         # to authenticate the user.
-        user = auth.authenticate(remote_user=username)
+        user = auth.authenticate(remote_user=username, shib_meta=shib_meta)
         if user:
             # User is valid.  Set request.user and persist user in the session
             # by logging the user in.
             request.user = user
             auth.login(request, user)
             user.set_unusable_password()
-            user.first_name = shib_meta.get('first_name', '')
-            user.last_name = shib_meta.get('last_name', '')
-            #import ipdb; ipdb.set_trace()
-            user.email = shib_meta.get('email', '')
             user.save()
             # call make profile.
             self.make_profile(user, shib_meta)

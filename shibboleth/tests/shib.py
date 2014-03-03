@@ -47,7 +47,7 @@ settings.SHIBBOLETH_ATTRIBUTE_MAP = {
 
 
 settings.AUTHENTICATION_BACKENDS += (
-    'django.contrib.auth.backends.RemoteUserBackend',
+    'shibboleth.backends.ShibbolethRemoteUserBackend',
 )
 
 settings.MIDDLEWARE_CLASSES += (
@@ -84,6 +84,8 @@ class AttributesTest(unittest.TestCase):
         #Test the context
         user = resp.context.get('user')
         self.assertEqual(user.email, 'Sample_Developer@school.edu')
+        self.assertEqual(user.first_name, 'Sample')
+        self.assertEqual(user.last_name, 'Developer')
         self.assertTrue(user.is_authenticated())
         self.assertFalse(user.is_anonymous())
 
