@@ -6,7 +6,7 @@ from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, LOGOUT_SESSION_KEY
 
 class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
     """
-    Authentication Middleware for use with Shibboleth.  Uses the recommended pattern 
+    Authentication Middleware for use with Shibboleth.  Uses the recommended pattern
     for remote authentication from: http://code.djangoproject.com/svn/django/tags/releases/1.3/django/contrib/auth/middleware.py
     """
     def process_request(self, request):
@@ -19,15 +19,15 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
                 " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
                 " before the RemoteUserMiddleware class.")
 
-        #To support logout.  If this variable is True, do not 
+        #To support logout.  If this variable is True, do not
         #authenticate user and return now.
         if request.session.get(LOGOUT_SESSION_KEY) == True:
-            return 
+            return
         else:
             #Delete the shib reauth session key if present.
 	        request.session.pop(LOGOUT_SESSION_KEY, None)
-	   
-        #Locate the remote user header.  
+
+        #Locate the remote user header.
         try:
             username = request.META[self.header]
         except KeyError:
@@ -62,18 +62,27 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             user.save()
             # call make profile.
             self.make_profile(user, shib_meta)
+            #setup session.
+            self.setup_session(request)
 
     def make_profile(self, user, shib_meta):
         """
         This is here as a stub to allow subclassing of ShibbolethRemoteUserMiddleware
         to include a make_profile method that will create a Django user profile
-        from the Shib provided attributes.  By default it does noting.
+        from the Shib provided attributes.  By default it does nothing.
         """
         return
-    
+
+    def setup_session(self, request):
+        """
+        If you want to add custom code to setup user sessions, you
+        can extend this.
+        """
+        return
+
     def parse_attributes(self, request):
         """
-        Parse the incoming Shibboleth attributes. 
+        Parse the incoming Shibboleth attributes.
         From: https://github.com/russell/django-shibboleth/blob/master/django_shibboleth/utils.py
         Pull the mapped attributes from the apache headers.
         """
