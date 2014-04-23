@@ -1,8 +1,8 @@
 from django.db import connection
 from django.contrib.auth.models import User, Permission
-from django.contrib.auth.backends import ModelBackend
+from django.contrib.auth.backends import RemoteUserBackend
 
-class ShibbolethRemoteUserBackend(ModelBackend):
+class ShibbolethRemoteUserBackend(RemoteUserBackend):
     """
     This backend is to be used in conjunction with the ``RemoteUserMiddleware``
     found in the middleware module of this package, and is used when the server
@@ -26,14 +26,12 @@ class ShibbolethRemoteUserBackend(ModelBackend):
         Returns None if ``create_unknown_user`` is ``False`` and a ``User``
         object with the given username is not found in the database.
         """
-
-	if not remote_user:
+        if not remote_user:
             return
         user = None
         username = self.clean_username(remote_user)
-	shib_user_params = dict([(k, shib_meta[k]) for k in User._meta.get_all_field_names() if k in shib_meta])
-
-	# Note that this could be accomplished in one try-except clause, but
+        shib_user_params = dict([(k, shib_meta[k]) for k in User._meta.get_all_field_names() if k in shib_meta])
+        # Note that this could be accomplished in one try-except clause, but
         # instead we use get_or_create when creating unknown users since it has
         # built-in safeguards for multiple threads.
         if self.create_unknown_user:
@@ -45,21 +43,4 @@ class ShibbolethRemoteUserBackend(ModelBackend):
                 user = User.objects.get(**shib_user_params)
             except User.DoesNotExist:
                 pass
-        return user
-
-    def clean_username(self, username):
-        """
-        Performs any cleaning on the "username" prior to using it to get or
-        create the user object.  Returns the cleaned username.
-
-        By default, returns the username unchanged.
-        """
-        return username
-    
-    def configure_user(self, user):
-        """
-        Configures a user after creation and returns the updated user.
-
-        By default, returns the user unmodified.
-        """
         return user
