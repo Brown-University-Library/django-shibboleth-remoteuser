@@ -57,7 +57,7 @@ Installation and configuration
    LOGIN_URL = 'https://school.edu/Shibboleth.sso/Login'
    ```
 
- * Apache configuration - make sure the shibboleth attributes are available to the app.
+ * Apache configuration - make sure the shibboleth attributes are available to the app.  The app url doesn't need to require Shibboleth but the Shibboleth headers need to be available to the Django application.  
 
     ```
     <Location /app>
