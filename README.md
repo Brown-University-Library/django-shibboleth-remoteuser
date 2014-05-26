@@ -40,7 +40,7 @@ Installation and configuration
     If first_name, last_name, email are available as Shibboleth attributes they will be used to populate the Django User object.
     The tuple of (True, "username") specifies that username is required.
     If it is not found in the parsed Shibboleth headers, an exception will be raised.
-    To make a Shibboleth attribute specify it like this (False, "optional_attribute).
+    To make a Shibboleth attribute optional specify it like this (False, "optional_attribute).
 
     ```python
     SHIBBOLETH_ATTRIBUTE_MAP = {
