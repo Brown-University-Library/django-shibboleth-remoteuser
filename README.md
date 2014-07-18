@@ -67,8 +67,9 @@ Installation and configuration
     </Location>
     ```
 
-Optional
+Verify configuration
 --------
+If you would like to verify that everything is configured correctly, follow the next two steps below.  It will create a route in your application at /yourapp/shib/ that echos the attributes obtained from Shibboleth.  If you see the attributes you mapped above on the screen, all is good.  
  * Add shibboleth to installed apps.
 
     ```python
@@ -85,7 +86,11 @@ Optional
     )
     ```
 
- * Template tags are included which will allow you to place {{ login_link }} or {{ logout_link }} in your templates for routing users to the login or logout page.  To activate add the following to settings.py.
+At this point, the django-shibboleth-remoteuser middleware should be complete.
+
+##Optional
+###Template tags
+ * Template tags are included which will allow you to place {{ login_link }} or {{ logout_link }} in your templates for routing users to the login or logout page.  These are available as a convenience and not required.  To activate add the following to settings.py.
 
    ```python
     TEMPLATE_CONTEXT_PROCESSORS += (
