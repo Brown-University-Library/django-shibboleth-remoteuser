@@ -44,7 +44,7 @@ class ShibbolethView(TemplateView):
 
 class ShibbolethLoginView(TemplateView):
     """
-    Pass the user to the Shibboleth logout page.
+    Pass the user to the Shibboleth login page.
     Some code borrowed from:
     https://github.com/stefanfoulis/django-class-based-auth-views.
     """
