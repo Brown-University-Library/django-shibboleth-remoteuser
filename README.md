@@ -56,11 +56,19 @@ Installation and configuration
 
 
 
-  * Login url - set this to the login handler of your shibboleth installation. In most cases, this will be something like:
+  * Login and Logout url - set this to the login/Logout handler of your shibboleth installation. 
+    In most cases, this will be something like:
 
-   ```python
-   LOGIN_URL = 'https://your_domain.edu/Shibboleth.sso/Login'
+    ```python
+    SHIBBOLETH_LOGIN_URL = 'https://your_domain.edu/Shibboleth.sso/Login'
+    SHIBBOLETH_LOGOUT_URL = 'https://your_domain.edu/Shibboleth.sso/Logout'
    ```
+ * Set the django `LOGIN_URL` to the login-view provided by this package:
+   
+    ```python
+    LOGIN_URL = '/shib/login/'
+    ```
+    You can also manually address this url. It is necessary to specify a redirect location using the url parameter `next`.
 
  * Apache configuration - make sure the shibboleth attributes are available to the app.  The app url doesn't need to require Shibboleth but the Shibboleth headers need to be available to the Django application.  
 
