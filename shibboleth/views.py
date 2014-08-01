@@ -12,7 +12,7 @@ from django.views.generic import TemplateView
 from urllib import quote
 
 #Logout settings.
-from shibboleth.app_settings import LOGOUT_URL, LOGOUT_REDIRECT_URL, LOGOUT_SESSION_KEY
+from shibboleth.app_settings import SHIBBOLETH_LOGIN_URL, SHIBBOLETH_LOGOUT_URL, LOGOUT_REDIRECT_URL, LOGOUT_SESSION_KEY
 
 class ShibbolethView(TemplateView):
     """
@@ -44,16 +44,16 @@ class ShibbolethView(TemplateView):
 
 class ShibbolethLoginView(TemplateView):
     """
-    Pass the user to the Shibboleth login page.
+    Pass the user to the Shibboleth logout page.
     Some code borrowed from:
     https://github.com/stefanfoulis/django-class-based-auth-views.
     """
-    redirect_field_name = "target"
+    redirect_field_name = "next"
 
     def get(self, *args, **kwargs):
         #Remove session value that is forcing Shibboleth reauthentication.
         self.request.session.pop(LOGOUT_SESSION_KEY, None)
-        login = settings.LOGIN_URL + '?target=%s' % quote(self.request.GET.get(self.redirect_field_name))
+        login = SHIBBOLETH_LOGIN_URL + '?target=%s' % quote(self.request.GET.get(self.redirect_field_name))
         return redirect(login)
     
 class ShibbolethLogoutView(TemplateView):
@@ -62,7 +62,7 @@ class ShibbolethLogoutView(TemplateView):
     Some code borrowed from:
     https://github.com/stefanfoulis/django-class-based-auth-views.
     """
-    redirect_field_name = "target"
+    redirect_field_name = "next"
 
     def get(self, *args, **kwargs):
         #Log the user out.
@@ -74,7 +74,7 @@ class ShibbolethLogoutView(TemplateView):
         target = LOGOUT_REDIRECT_URL or\
                  quote(self.request.GET.get(self.redirect_field_name)) or\
                  quote(request.build_absolute_uri())
-        logout = LOGOUT_URL % target
+        logout = SHIBBOLETH_LOGOUT_URL + '?target=%s' % target
         return redirect(logout)
 
 
