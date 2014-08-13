@@ -47,7 +47,7 @@ Installation and configuration
 
     ```python
     SHIBBOLETH_ATTRIBUTE_MAP = {
-       "HTTP_SHIB_USER": (True, "username"),,
+       "HTTP_SHIB_USER": (True, "username"),
        "HTTP_SHIB_GIVEN_NAME": (True, "first_name"),
        "HTTP_SHIP_SN": (True, "last_name"),
        "HTTP_SHIB_MAIL": (False, "email"),
