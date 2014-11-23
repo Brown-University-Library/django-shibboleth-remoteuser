@@ -2,7 +2,7 @@ from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
 
-from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, LOGOUT_SESSION_KEY
+from shibboleth.app_settings import LOGOUT_SESSION_KEY
 
 class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
     """
@@ -29,6 +29,7 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
 
         #Locate the remote user header.
         try:
+            # self.header is set to REMOTE_USER. This is what the user CLAIMS to be.
             username = request.META[self.header]
         except KeyError:
             # If specified header doesn't exist then return (leaving
@@ -42,17 +43,11 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             if request.user.username == self.clean_username(username, request):
                 return
 
-        # Make sure we have all required Shiboleth elements before proceeding.
-        shib_meta, error = self.parse_attributes(request)
-        # Add parsed attributes to the session.
-        request.session['shib'] = shib_meta
-        if error:
-            raise ShibbolethValidationError("All required Shibboleth elements"
-                                            " not found.  %s" % shib_meta)
 
         # We are seeing this user for the first time in this session, attempt
         # to authenticate the user.
-        user = auth.authenticate(remote_user=username, shib_meta=shib_meta)
+        # The last two arguments look strang and in fact I want to remove them as I think they reflect a security problem.
+        user = auth.authenticate(remote_user=username, META_HEADERS=request.META, session=request.session)
         if user:
             # User is valid.  Set request.user and persist user in the session
             # by logging the user in.
@@ -61,42 +56,22 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             user.set_unusable_password()
             user.save()
             # call make profile.
-            self.make_profile(user, shib_meta)
+            #self.make_profile(user, shib_meta)
             #setup session.
-            self.setup_session(request)
+            #self.setup_session(request)
 
-    def make_profile(self, user, shib_meta):
-        """
-        This is here as a stub to allow subclassing of ShibbolethRemoteUserMiddleware
-        to include a make_profile method that will create a Django user profile
-        from the Shib provided attributes.  By default it does nothing.
-        """
-        return
+    # def make_profile(self, user, shib_meta):
+    #     """
+    #     This is here as a stub to allow subclassing of ShibbolethRemoteUserMiddleware
+    #     to include a make_profile method that will create a Django user profile
+    #     from the Shib provided attributes.  By default it does nothing.
+    #     """
+    #     return
 
-    def setup_session(self, request):
-        """
-        If you want to add custom code to setup user sessions, you
-        can extend this.
-        """
-        return
+    # def setup_session(self, request):
+    #     """
+    #     If you want to add custom code to setup user sessions, you
+    #     can extend this.
+    #     """
+    #     return
 
-    def parse_attributes(self, request):
-        """
-        Parse the incoming Shibboleth attributes.
-        From: https://github.com/russell/django-shibboleth/blob/master/django_shibboleth/utils.py
-        Pull the mapped attributes from the apache headers.
-        """
-        shib_attrs = {}
-        error = False
-        meta = request.META
-        for header, attr in SHIB_ATTRIBUTE_MAP.items():
-            required, name = attr
-            value = meta.get(header, None)
-            shib_attrs[name] = value
-            if not value or value == '':
-                if required:
-                    error = True
-        return shib_attrs, error
-
-class ShibbolethValidationError(Exception):
-    pass
