@@ -3,14 +3,17 @@ django-shibboleth-remoteuser
 
 Middleware for using Shibboleth with Django.  Requires Django 1.3 or above for RemoteAuthMiddleware.
 
-[![Build Status](https://secure.travis-ci.org/Brown-University-Library/django-shibboleth-remoteuser.png?branch=master)](http://travis-ci.org/Brown-University-Library/django-shibboleth-remoteuser)
+TODO: Follow this pattern more closely: https://docs.djangoproject.com/en/dev/howto/auth-remote-user/
+But make sure to take  REMOTE_USER as a user-claim and check it against the permanent-id in the backend.
+
+TODO: Fix travis
 
 Installation and configuration
 ------
  * Either checkout and run ```python setup.py install``` or install directly from Github with pip:
 
    ```
-   pip install git+https://github.com/Brown-University-Library/django-shibboleth-remoteuser.git
+   pip install git+https://github.com/???????django-shibboleth-remoteuser.git
    ```
 
  * In settings.py :
@@ -47,10 +50,8 @@ Installation and configuration
 
     ```python
     SHIBBOLETH_ATTRIBUTE_MAP = {
-       "HTTP_SHIB_USER": (True, "username"),,
-       "HTTP_SHIB_GIVEN_NAME": (True, "first_name"),
-       "HTTP_SHIP_SN": (True, "last_name"),
-       "HTTP_SHIB_MAIL": (False, "email"),
+       "shib-user": (True, "username"),
+       "shib-given-name": (True, "first_name")
     }
     ```
 
@@ -70,13 +71,12 @@ Installation and configuration
     ```
     You can also manually address this url. It is necessary to specify a redirect location using the url parameter `next`.
 
- * Apache configuration - make sure the shibboleth attributes are available to the app.  The app url doesn't need to require Shibboleth but the Shibboleth headers need to be available to the Django application.  
+ * Apache configuration - make sure the shibboleth attributes are available to the app.  The shibboleth variables are passed into the HttpRequest.META dictionary via wsgi.
 
     ```
     <Location /app>
       AuthType shibboleth
       Require shibboleth
-      ShibUseHeaders On
     </Location>
     ```
 

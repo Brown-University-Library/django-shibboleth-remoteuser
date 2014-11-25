@@ -33,7 +33,6 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
             return
         user = None
         username = remote_user
-        # the fact that username is not checked against the shibboleth-ID is a security hole here.
 
 
         # Make sure we have all required Shiboleth elements before proceeding.
