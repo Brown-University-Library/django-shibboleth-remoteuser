@@ -42,11 +42,10 @@ Installation and configuration
     SHIBBOLETH_USER_KEY='<shibboleth-attribute>'
   ```
 	
-  * Map Shibboleth attributes to Django User models. The attributes must be stated in the form they have in the HTTP headers.
-    Use this to populate the Djangoe User object from Shibboleth attributes. A username is always required.
+  * Map Shibboleth attributes to Django User models. Use this to populate the Djangoe User object with additional Shibboleth attributes, but do NOT overwrite `username`. The attributes must be stated in the form they have in the request.META dictionary, which should be the same as in the configuration of your shibboleth SP.
+    
 
-    The first element of the tuple states if the attribute is required or not. If a reqired element is not found in the parsed 
-    Shibboleth headers, an exception will be raised.
+    The first element of the tuple states if the attribute is required or not. If a reqired element is not found in the request.META dictionary, an exception will be raised.
     (True, "required_attribute")
     (False, "optional_attribute).
 
