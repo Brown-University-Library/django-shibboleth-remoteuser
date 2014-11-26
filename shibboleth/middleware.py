@@ -47,7 +47,7 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
         # We are seeing this user for the first time in this session, attempt
         # to authenticate the user.
         # The last two arguments look strang and in fact I want to remove them as I think they reflect a security problem.
-        user = auth.authenticate(remote_user=username, META_HEADERS=request.META, session=request.session)
+        user = auth.authenticate(remote_user=username, META_HEADERS=request.META)
         if user:
             # User is valid.  Set request.user and persist user in the session
             # by logging the user in.

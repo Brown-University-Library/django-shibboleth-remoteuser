@@ -20,7 +20,7 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
     # Create a User object if not already in the database?
     create_unknown_user = True
 
-    def authenticate(self, remote_user, META_HEADERS,session):
+    def authenticate(self, remote_user, META_HEADERS):
         """
         The username passed as ``remote_user`` is considered trusted.  This
         method simply returns the ``User`` object with the given username,
@@ -37,8 +37,7 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
 
         # Make sure we have all required Shiboleth elements before proceeding.
         shib_meta, error = self.parse_attributes(META_HEADERS)
-        # Add parsed attributes to the session. # Why is this necessary??
-        session['shib'] = shib_meta
+
 
         if error:
             raise ShibbolethValidationError("All required Shibboleth elements"
