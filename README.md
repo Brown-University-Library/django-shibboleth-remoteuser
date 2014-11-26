@@ -1,10 +1,8 @@
 django-shibboleth-remoteuser
 ============================
 
-Middleware for using Shibboleth with Django.  Requires Django 1.3 or above for RemoteAuthMiddleware.
+Middleware for using Shibboleth with Django.  Requires Django 1.6 or above.
 
-TODO: Follow this pattern more closely: https://docs.djangoproject.com/en/dev/howto/auth-remote-user/
-But make sure to take  REMOTE_USER as a user-claim and check it against the permanent-id in the backend.
 
 TODO: Fix travis
 
