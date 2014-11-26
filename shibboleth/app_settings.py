@@ -24,6 +24,6 @@ SHIBBOLETH_LOGOUT_URL = getattr(settings, 'SHIBBOLETH_LOGOUT_URL', None)
 #users logout from Shibboleth.
 LOGOUT_REDIRECT_URL = getattr(settings, 'SHIBBOLETH_LOGOUT_REDIRECT_URL', None)
 #Name of key.  Probably no need to change this.  
-LOGOUT_SESSION_KEY = getattr(settings, 'SHIBBOLETH_FORCE_REAUTH_SESSION_KEY', 'shib_force_reauth')
+SHIBBOLETH_USER_KEY = getattr(settings, 'SHIBBOLETH_USER_KEY', None)
 
 
