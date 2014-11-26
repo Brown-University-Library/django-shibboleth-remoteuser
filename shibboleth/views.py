@@ -65,16 +65,13 @@ class ShibbolethLogoutView(TemplateView):
     redirect_field_name = "next"
 
     def get(self, *args, **kwargs):
-        #Log the user out.
+        #Log the user out. This means a full logout from shibboleth. There is no such thing as logging out from the service, but staying logged into shibboleth. It is single-sign on. Either you're signed in to all, or not.
         auth.logout(self.request)
-        #Set session key that middleware will use to force 
-        #Shibboleth reauthentication.
-        self.request.session[LOGOUT_SESSION_KEY] = True
-        #Get target url in order of preference.
         target = LOGOUT_REDIRECT_URL or\
                  quote(self.request.GET.get(self.redirect_field_name)) or\
                  quote(request.build_absolute_uri())
         logout = SHIBBOLETH_LOGOUT_URL + '?target=%s' % target
+
         return redirect(logout)
 
 
