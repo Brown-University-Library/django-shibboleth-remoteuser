@@ -1,5 +1,3 @@
-
-
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
@@ -51,8 +49,6 @@ class ShibbolethLoginView(TemplateView):
     redirect_field_name = "next"
 
     def get(self, *args, **kwargs):
-        #Remove session value that is forcing Shibboleth reauthentication.
-        self.request.session.pop(LOGOUT_SESSION_KEY, None)
         login = SHIBBOLETH_LOGIN_URL + '?target=%s' % quote(self.request.GET.get(self.redirect_field_name))
         return redirect(login)
     

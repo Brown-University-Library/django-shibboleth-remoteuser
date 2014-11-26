@@ -39,7 +39,11 @@ Installation and configuration
     )
     ```
 
-
+  * Define the shibboleth user key. This is the shibboleth attribute that is used to identify the user. It becomes the user name in django.
+  ```python
+    SHIBBOLETH_USER_KEY='<shibboleth-attribute>'
+  ```
+	
   * Map Shibboleth attributes to Django User models. The attributes must be stated in the form they have in the HTTP headers.
     Use this to populate the Djangoe User object from Shibboleth attributes. A username is always required.
 
@@ -50,8 +54,8 @@ Installation and configuration
 
     ```python
     SHIBBOLETH_ATTRIBUTE_MAP = {
-       "shib-user": (True, "username"),
-       "shib-given-name": (True, "first_name")
+       "shib-given-name": (True, "first_name"),
+	...
     }
     ```
 
