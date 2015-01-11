@@ -47,10 +47,10 @@ Installation and configuration
 
     ```python
     SHIBBOLETH_ATTRIBUTE_MAP = {
-       "HTTP_SHIB_USER": (True, "username"),
-       "HTTP_SHIB_GIVEN_NAME": (True, "first_name"),
-       "HTTP_SHIP_SN": (True, "last_name"),
-       "HTTP_SHIB_MAIL": (False, "email"),
+       "shib-user": (True, "username"),
+       "shib-given-name": (True, "first_name"),
+       "shib-sn": (True, "last_name"),
+       "shib-mail": (False, "email"),
     }
     ```
 
@@ -62,13 +62,12 @@ Installation and configuration
    LOGIN_URL = 'https://your_domain.edu/Shibboleth.sso/Login'
    ```
 
- * Apache configuration - make sure the shibboleth attributes are available to the app.  The app url doesn't need to require Shibboleth but the Shibboleth headers need to be available to the Django application.  
+ * Apache configuration - make sure the shibboleth attributes are available to the app.  The app url doesn't need to require Shibboleth.  
 
     ```
     <Location /app>
       AuthType shibboleth
       Require shibboleth
-      ShibUseHeaders On
     </Location>
     ```
 
