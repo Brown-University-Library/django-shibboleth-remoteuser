@@ -38,7 +38,7 @@ Installation and configuration
 
 
   * Map Shibboleth attributes to Django User models. The attributes must be stated in the form they have in the HTTP headers.
-    Use this to populate the Djangoe User object from Shibboleth attributes. A username is always required.
+    Use this to populate the Django User object from Shibboleth attributes.
 
     The first element of the tuple states if the attribute is required or not. If a reqired element is not found in the parsed 
     Shibboleth headers, an exception will be raised.
