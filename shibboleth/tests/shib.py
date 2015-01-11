@@ -9,7 +9,7 @@ from django.test.client import RequestFactory
 from django.test.client import Client
 
 SAMPLE_HEADERS = {
-  "REMOTE_USER": 'devloper@school.edu',
+  "REMOTE_USER": 'sampledeveloper@school.edu',
   "Shib-Application-ID": "default", 
   "Shib-Authentication-Method": "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified", 
   "Shib-AuthnContext-Class": "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified", 
