@@ -5,6 +5,7 @@ python:
   - "2.6"
   - "2.7"
   - "3.4"
+
 # List the versions of Django you'd like to test against
 env:
   - DJANGO_VERSION=1.5
