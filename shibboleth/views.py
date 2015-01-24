@@ -8,7 +8,7 @@ from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
 
 try:
-    from django.utils.six.moves.urllib_parse import quote
+    from django.utils.six.moves.urllib.parse import quote
 except ImportError:
     from urllib import quote
 

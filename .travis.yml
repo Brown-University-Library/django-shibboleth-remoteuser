@@ -14,8 +14,12 @@ env:
 
 matrix:
   exclude:
-    - env: DJANGO_VERSION=1.5
-    - python: 3.4
+    - python: "3.4"
+      env: DJANGO_VERSION=1.5
+    - python: "3.4"
+      env: DJANGO_VERSION=1.6
+    - python: "2.6"
+      env: DJANGO_VERSION=1.7
     
 install: 
    # Travis is currently working on
