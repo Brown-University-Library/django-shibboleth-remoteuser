@@ -1,5 +1,5 @@
 from django.core.urlresolvers import reverse
-from urllib import quote
+from django.utils.six.moves.urllib_parse import quote
 
 def login_link(request):
     """
