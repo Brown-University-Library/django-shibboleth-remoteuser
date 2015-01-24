@@ -100,10 +100,10 @@ class QuickDjangoTest(object):
 
         self.__configure_settings()
         django.setup()
-        TestRunner = get_runner(settings)
-        failures = TestRunner().run_tests(self.apps, verbosity=1)
+        from django.test.simple import DjangoTestSuiteRunner
+        failures = DjangoTestSuiteRunner().run_tests(self.apps, verbosity=1)
         if failures:
-            sys.exit(failures)
+            sys.exit(failures) 
 
     def _supported_tests(self):
         """
