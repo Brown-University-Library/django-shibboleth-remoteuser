@@ -11,6 +11,12 @@ env:
   - DJANGO_VERSION=1.5
   - DJANGO_VERSION=1.6
   - DJANGO_VERSION=1.7
+
+matrix:
+  exclude:
+    - env: DJANGO_VERSION=1.5
+    - python: 3.4
+    
 install: 
    # Travis is currently working on
  - pip install -q Django==$DJANGO_VERSION --use-mirrors
