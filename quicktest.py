@@ -7,6 +7,8 @@ http://datadesk.latimes.com/posts/2012/06/test-your-django-app-with-travisci/
 
 import os
 import sys
+import django
+from distutils.version import StrictVersion
 from django.conf import settings
 
 
@@ -49,6 +51,13 @@ class QuickDjangoTest(object):
         else:
             return 'old'
     
+    def _django_setup(self):
+        """
+        Initialize Django (1.7+ only)
+        """
+        if StrictVersion(django.get_version()) >= StrictVersion('1.7'):
+            django.setup()
+
     def _old_tests(self):
         """
         Fire up the Django test suite from before version 1.2
@@ -56,8 +65,9 @@ class QuickDjangoTest(object):
         settings.configure(DEBUG = True,
            DATABASE_ENGINE = 'sqlite3',
            DATABASE_NAME = os.path.join(self.DIRNAME, 'database.db'),
-           INSTALLED_APPS = self.INSTALLED_APPS + self.apps
+           INSTALLED_APPS = self.INSTALLED_APPS + self.apps,
         )
+        self._django_setup()
         from django.test.simple import run_tests
         failures = run_tests(self.apps, verbosity=1)
         if failures:
@@ -80,8 +90,9 @@ class QuickDjangoTest(object):
                 }
             },
             INSTALLED_APPS = self.INSTALLED_APPS + self.apps,
-	    ROOT_URLCONF = 'shib.urls',
+            ROOT_URLCONF = 'shib.urls',
         )
+        self._django_setup()
         from django.test.simple import DjangoTestSuiteRunner
         failures = DjangoTestSuiteRunner().run_tests(self.apps, verbosity=1)
         if failures:
