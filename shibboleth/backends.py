@@ -37,23 +37,29 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
         if not remote_user:
             return
         user = None
-        user_model = get_user_model()
         username = self.clean_username(remote_user)
+
+        UserModel = get_user_model()
+
         shib_user_params = dict(
             [(k, shib_meta[k])
-             for k in user_model._meta.get_all_field_names()
+             for k in UserModel._meta.get_all_field_names()
              if k in shib_meta])
 
         # Note that this could be accomplished in one try-except clause, but
         # instead we use get_or_create when creating unknown users since it has
         # built-in safeguards for multiple threads.
         if self.create_unknown_user:
-            user, created = user_model.objects.get_or_create(username=username, defaults=shib_user_params)
+            user, created = UserModel._default_manager.get_or_create(**{
+                UserModel.USERNAME_FIELD: username,
+                'defaults': shib_user_params,
+            })
             if created:
                 user = self.configure_user(user)
         else:
             try:
-                user = user_model.objects.get(**shib_user_params)
-            except user_model.DoesNotExist:
+                user = UserModel._default_manager.get(**shib_user_params)
+            except UserModel.DoesNotExist:
                 pass
+
         return user
