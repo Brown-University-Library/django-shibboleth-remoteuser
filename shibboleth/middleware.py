@@ -25,7 +25,7 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             return
         else:
             #Delete the shib reauth session key if present.
-	        request.session.pop(LOGOUT_SESSION_KEY, None)
+            request.session.pop(LOGOUT_SESSION_KEY, None)
 
         #Locate the remote user header.
         try:
