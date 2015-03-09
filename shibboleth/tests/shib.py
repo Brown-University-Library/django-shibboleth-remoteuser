@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 
 import os
+from distutils.version import StrictVersion
 
+import django
 from django.conf import settings
 from django.utils import unittest
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.client import Client
+from django.test.utils import override_settings
+
+if StrictVersion(django.get_version()) >= StrictVersion('1.7'):
+    django.setup()
 
 SAMPLE_HEADERS = {
   "REMOTE_USER": 'sampledeveloper@school.edu',
@@ -51,6 +57,8 @@ settings.AUTHENTICATION_BACKENDS += (
 )
 
 settings.MIDDLEWARE_CLASSES += (
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
 )
 
@@ -115,4 +123,3 @@ class LogoutTest(unittest.TestCase):
         self.assertEqual(resp.status_code, 302)
         #Make sure the context is empty.
         self.assertEqual(resp.context, None)
-        

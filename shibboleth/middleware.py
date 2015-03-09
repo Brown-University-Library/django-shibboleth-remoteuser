@@ -25,7 +25,7 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             return
         else:
             #Delete the shib reauth session key if present.
-	        request.session.pop(LOGOUT_SESSION_KEY, None)
+            request.session.pop(LOGOUT_SESSION_KEY, None)
 
         #Locate the remote user header.
         try:
@@ -34,12 +34,14 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             # If specified header doesn't exist then return (leaving
             # request.user set to AnonymousUser by the
             # AuthenticationMiddleware).
+            if request.user.is_authenticated():
+                self._remove_invalid_user(request)
             return
         # If the user is already authenticated and that user is the user we are
         # getting passed in the headers, then the correct user is already
         # persisted in the session and we don't need to continue.
         if request.user.is_authenticated():
-            if request.user.username == self.clean_username(username, request):
+            if request.user.get_username() == self.clean_username(username, request):
                 return
 
         # Make sure we have all required Shiboleth elements before proceeding.

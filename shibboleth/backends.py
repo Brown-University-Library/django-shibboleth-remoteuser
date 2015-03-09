@@ -1,4 +1,12 @@
 from django.db import connection
+try:
+    from django.contrib.auth import get_user_model
+except ImportError:
+    from django.contrib.auth.models import User
+
+    def get_user_model():
+        return User
+
 from django.contrib.auth.models import User, Permission
 from django.contrib.auth.backends import RemoteUserBackend
 
@@ -30,17 +38,28 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
             return
         user = None
         username = self.clean_username(remote_user)
-        shib_user_params = dict([(k, shib_meta[k]) for k in User._meta.get_all_field_names() if k in shib_meta])
+
+        UserModel = get_user_model()
+
+        shib_user_params = dict(
+            [(k, shib_meta[k])
+             for k in UserModel._meta.get_all_field_names()
+             if k in shib_meta])
+
         # Note that this could be accomplished in one try-except clause, but
         # instead we use get_or_create when creating unknown users since it has
         # built-in safeguards for multiple threads.
         if self.create_unknown_user:
-            user, created = User.objects.get_or_create(username=username, defaults=shib_user_params)
+            user, created = UserModel._default_manager.get_or_create(**{
+                UserModel.USERNAME_FIELD: username,
+                'defaults': shib_user_params,
+            })
             if created:
                 user = self.configure_user(user)
         else:
             try:
-                user = User.objects.get(**shib_user_params)
-            except User.DoesNotExist:
+                user = UserModel._default_manager.get(**shib_user_params)
+            except UserModel.DoesNotExist:
                 pass
+
         return user
