@@ -40,7 +40,7 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
                 user = self.configure_user(user)
         else:
             try:
-                user = User.objects.get(**shib_user_params)
+                user = User.objects.get(username=username)
             except User.DoesNotExist:
                 pass
         return user
