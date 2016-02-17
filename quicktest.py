@@ -78,25 +78,24 @@ class QuickDjangoTest(object):
         """
         Fire up the Django test suite developed for version >= 1.7
         """
-        from django.test.utils import get_runner
-
         self.__configure_settings()
         django.setup()
-        from django.test.simple import DjangoTestSuiteRunner
-        failures = DjangoTestSuiteRunner().run_tests(self.apps, verbosity=1)
+        from django.test.runner import DiscoverRunner
+        failures = DiscoverRunner().run_tests(self.apps, verbosity=1)
         if failures:
             sys.exit(failures) 
 
     def _supported_tests(self):
         """
-        Tests for django 1.2 > version < 1.7
+        Tests for django version < 1.7
         """
         self.__configure_settings()
 
-        from django.test.simple import DjangoTestSuiteRunner
-        failures = DjangoTestSuiteRunner().run_tests(self.apps, verbosity=1)
+        from django.test.runner import DiscoverRunner
+        failures = DiscoverRunner().run_tests(self.apps, verbosity=1)
         if failures:
             sys.exit(failures) 
+
 
 if __name__ == '__main__':
     """
