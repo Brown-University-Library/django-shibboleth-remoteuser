@@ -8,15 +8,12 @@ python:
 
 # List the versions of Django you'd like to test against
 env:
-  - DJANGO_VERSION=1.5
   - DJANGO_VERSION=1.6
   - DJANGO_VERSION=1.7
   - DJANGO_VERSION=1.8
 
 matrix:
   exclude:
-    - python: "3.4"
-      env: DJANGO_VERSION=1.5
     - python: "3.4"
       env: DJANGO_VERSION=1.6
     - python: "2.6"
