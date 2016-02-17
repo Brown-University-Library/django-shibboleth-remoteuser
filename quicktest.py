@@ -38,8 +38,6 @@ class QuickDjangoTest(object):
             self._supported_tests()
         elif self.version == 'new':
             self._new_tests()
-        else:
-            self._old_tests()
     
     def get_test_version(self):
         """
@@ -50,23 +48,7 @@ class QuickDjangoTest(object):
             if VERSION[1] >= 7:
                 return 'new'
             return 'supported'
-        else:
-            return 'old'
     
-    def _old_tests(self):
-        """
-        Fire up the Django test suite from before version 1.2
-        """
-        settings.configure(DEBUG = True,
-           DATABASE_ENGINE = 'sqlite3',
-           DATABASE_NAME = os.path.join(self.DIRNAME, 'database.db'),
-           INSTALLED_APPS = self.INSTALLED_APPS + self.apps
-        )
-        from django.test.simple import run_tests
-        failures = run_tests(self.apps, verbosity=1)
-        if failures:
-            sys.exit(failures)
-
     def __configure_settings(self):
         settings.configure(
             DEBUG = True,
