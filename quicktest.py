@@ -7,8 +7,8 @@ http://datadesk.latimes.com/posts/2012/06/test-your-django-app-with-travisci/
 
 import os
 import sys
+import django
 from django.conf import settings
-
 
 class QuickDjangoTest(object):
     """
@@ -34,7 +34,9 @@ class QuickDjangoTest(object):
         # Get the version of the test suite
         self.version = self.get_test_version()
         # Call the appropriate one
-        if self.version == 'new':
+        if self.version == 'supported':
+            self._supported_tests()
+        elif self.version == 'new':
             self._new_tests()
         else:
             self._old_tests()
@@ -45,7 +47,9 @@ class QuickDjangoTest(object):
         """
         from django import VERSION
         if VERSION[0] == 1 and VERSION[1] >= 2:
-            return 'new'
+            if VERSION[1] >= 7:
+                return 'new'
+            return 'supported'
         else:
             return 'old'
     
@@ -62,11 +66,8 @@ class QuickDjangoTest(object):
         failures = run_tests(self.apps, verbosity=1)
         if failures:
             sys.exit(failures)
-    
-    def _new_tests(self):
-        """
-        Fire up the Django test suite developed for version 1.2
-        """
+
+    def __configure_settings(self):
         settings.configure(
             DEBUG = True,
             DATABASES = {
@@ -80,12 +81,40 @@ class QuickDjangoTest(object):
                 }
             },
             INSTALLED_APPS = self.INSTALLED_APPS + self.apps,
+            MIDDLEWARE_CLASSES = (
+                                        'django.contrib.sessions.middleware.SessionMiddleware',
+                                                'django.middleware.common.CommonMiddleware',
+                                                        'django.middleware.csrf.CsrfViewMiddleware',
+                                                                'django.contrib.auth.middleware.AuthenticationMiddleware',
+                                                                        'django.contrib.messages.middleware.MessageMiddleware',
+                                                                                'django.middleware.clickjacking.XFrameOptionsMiddleware',
+                                                                                    ),
 	    ROOT_URLCONF = 'shib.urls',
         )
+    
+    def _new_tests(self):
+        """
+        Fire up the Django test suite developed for version >= 1.7
+        """
+        from django.test.utils import get_runner
+
+        self.__configure_settings()
+        django.setup()
         from django.test.simple import DjangoTestSuiteRunner
         failures = DjangoTestSuiteRunner().run_tests(self.apps, verbosity=1)
         if failures:
-            sys.exit(failures)
+            sys.exit(failures) 
+
+    def _supported_tests(self):
+        """
+        Tests for django 1.2 > version < 1.7
+        """
+        self.__configure_settings()
+
+        from django.test.simple import DjangoTestSuiteRunner
+        failures = DjangoTestSuiteRunner().run_tests(self.apps, verbosity=1)
+        if failures:
+            sys.exit(failures) 
 
 if __name__ == '__main__':
     """
