@@ -31,23 +31,14 @@ class QuickDjangoTest(object):
     
     def __init__(self, *args, **kwargs):
         self.apps = args
-        # Get the version of the test suite
-        self.version = self.get_test_version()
-        # Call the appropriate one
-        if self.version == 'supported':
-            self._supported_tests()
-        elif self.version == 'new':
-            self._new_tests()
+        self._run_tests()
     
-    def get_test_version(self):
-        """
-        Figure out which version of Django's test suite we have to play with.
-        """
+    def _django_setup_required(self):
         from django import VERSION
-        if VERSION[0] == 1 and VERSION[1] >= 2:
-            if VERSION[1] >= 7:
-                return 'new'
-            return 'supported'
+        if VERSION[0] == 1 and VERSION[1] < 7:
+            return False
+        else:
+            return True
     
     def __configure_settings(self):
         settings.configure(
@@ -74,23 +65,10 @@ class QuickDjangoTest(object):
 	    ROOT_URLCONF = 'shib.urls',
         )
     
-    def _new_tests(self):
-        """
-        Fire up the Django test suite developed for version >= 1.7
-        """
+    def _run_tests(self):
         self.__configure_settings()
-        django.setup()
-        from django.test.runner import DiscoverRunner
-        failures = DiscoverRunner().run_tests(self.apps, verbosity=1)
-        if failures:
-            sys.exit(failures) 
-
-    def _supported_tests(self):
-        """
-        Tests for django version < 1.7
-        """
-        self.__configure_settings()
-
+        if self._django_setup_required():
+            django.setup()
         from django.test.runner import DiscoverRunner
         failures = DiscoverRunner().run_tests(self.apps, verbosity=1)
         if failures:
