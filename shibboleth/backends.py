@@ -1,6 +1,7 @@
 from django.db import connection
 from django.contrib.auth.models import User, Permission
 from django.contrib.auth.backends import RemoteUserBackend
+from django.conf import settings
 
 class ShibbolethRemoteUserBackend(RemoteUserBackend):
     """
@@ -16,6 +17,8 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
 
     # Create a User object if not already in the database?
     create_unknown_user = True
+    if hasattr(settings, 'CREATE_UNKNOWN_USER'):
+        create_unknown_user = settings.CREATE_UNKNOWN_USER
 
     def authenticate(self, remote_user, shib_meta):
         """
