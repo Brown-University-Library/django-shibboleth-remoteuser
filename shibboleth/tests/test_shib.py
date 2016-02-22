@@ -3,7 +3,9 @@
 import os
 
 from django.conf import settings
-from django.utils import unittest
+from django.contrib import auth
+from django.contrib.auth.models import User
+from django.test import TestCase, override_settings
 from django.test.client import Client
 
 SAMPLE_HEADERS = {
@@ -58,26 +60,32 @@ settings.SHIBBOLETH_LOGOUT_URL = 'https://sso.school.edu/logout?next=%s'
 settings.SHIBBOLETH_LOGOUT_REDIRECT_URL = 'http://school.edu/'
 
 from shibboleth.views import ShibbolethView
+from shibboleth import backends
+
+
+try:
+    from importlib import reload #python 3.4+
+except ImportError:
+    try:
+        from imp import reload #for python 3.2/3.3
+    except ImportError:
+        pass #this means we're on python 2, where reload is a builtin function
+
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
-class AttributesTest(unittest.TestCase):   
-    def setUp(self):
-        self.c = Client()
+
+class AttributesTest(TestCase):
         
     def test_decorator_not_authenticated(self):
-        """
-        """
-        resp = self.c.get('/')
+        resp = self.client.get('/')
         self.assertEqual(resp.status_code, 302)
         #Test the context - shouldn't exist
         self.assertEqual(resp.context, None) 
         
     def test_decorator_authenticated(self):
-        """
-        """
-        resp = self.c.get('/', **SAMPLE_HEADERS)
+        resp = self.client.get('/', **SAMPLE_HEADERS)
         self.assertEqual(resp.status_code, 200)
         #Test the context
         user = resp.context.get('user')
@@ -87,19 +95,36 @@ class AttributesTest(unittest.TestCase):
         self.assertTrue(user.is_authenticated())
         self.assertFalse(user.is_anonymous())
 
-class LogoutTest(unittest.TestCase):   
-    def setUp(self):
-        self.c = Client()
-             
+
+class TestShibbolethRemoteUserBackend(TestCase):
+
+    def test_create_unknown_user_true(self):
+        self.assertFalse(User.objects.all())
+        user = auth.authenticate(remote_user='sampledeveloper@school.edu', shib_meta=SAMPLE_HEADERS)
+        self.assertEqual(user.username, 'sampledeveloper@school.edu')
+        self.assertEqual(User.objects.all()[0].username, 'sampledeveloper@school.edu')
+
+    def test_create_unknown_user_false(self):
+        with self.settings(CREATE_UNKNOWN_USER=False):
+            #reload our shibboleth.backends module, so it picks up the settings change
+            reload(backends)
+            self.assertFalse(User.objects.all())
+            user = auth.authenticate(remote_user='sampledeveloper@school.edu', shib_meta=SAMPLE_HEADERS)
+            self.assertTrue(user is None)
+            self.assertFalse(User.objects.all())
+        #now reload again, so it reverts to original settings
+        reload(backends)
+
+
+class LogoutTest(TestCase):
+
     def test_logout(self):
-        """
-        """
         from shibboleth import app_settings
         #Login
-        login = self.c.get('/', **SAMPLE_HEADERS)
+        login = self.client.get('/', **SAMPLE_HEADERS)
         self.assertEqual(login.status_code, 200)
         #Logout
-        logout = self.c.get('/logout/', **SAMPLE_HEADERS)
+        logout = self.client.get('/logout/', **SAMPLE_HEADERS)
         self.assertEqual(logout.status_code, 302)
         #Ensure redirect happened.
         self.assertEqual(
@@ -107,10 +132,9 @@ class LogoutTest(unittest.TestCase):
             'https://sso.school.edu/logout?next=http://school.edu/'
         )
         #Check to see if the session has the force logout key.
-        self.assertTrue(self.c.session.get(app_settings.LOGOUT_SESSION_KEY))
+        self.assertTrue(self.client.session.get(app_settings.LOGOUT_SESSION_KEY))
         #Load root url to see if user is in fact logged out.
-        resp = self.c.get('/', **SAMPLE_HEADERS)
+        resp = self.client.get('/', **SAMPLE_HEADERS)
         self.assertEqual(resp.status_code, 302)
         #Make sure the context is empty.
         self.assertEqual(resp.context, None)
-        
