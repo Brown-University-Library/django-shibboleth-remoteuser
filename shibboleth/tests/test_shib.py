@@ -5,7 +5,7 @@ import os
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.models import User
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.test.client import Client
 
 SAMPLE_HEADERS = {
