@@ -84,15 +84,13 @@ if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
 
 setup(
       name = "django-shibboleth-remoteuser",
-      version='0.5',
+      version='0.6-dev',
       long_description = read('README.md'),
-      author = 'Ted Lawless',
-      author_email = 'tlawless@brown.edu',
+      author = 'Brown University Library',
+      author_email = 'bdr@brown.edu',
       url = 'https://github.com/Brown-University-Library/django-shibboleth-remoteuser',
       include_package_data = True,
       packages=packages,
       cmdclass = cmdclasses,
       data_files=data_files,
 )
-
-
