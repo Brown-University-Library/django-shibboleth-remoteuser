@@ -33,7 +33,7 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
             return
         user = None
         username = self.clean_username(remote_user)
-        shib_user_params = dict([(k, shib_meta[k]) for k in User._meta.get_all_field_names() if k in shib_meta])
+        shib_user_params = dict([(k, shib_meta[k]) for k in User._meta.get_fields() if k in shib_meta])
         # Note that this could be accomplished in one try-except clause, but
         # instead we use get_or_create when creating unknown users since it has
         # built-in safeguards for multiple threads.
