@@ -33,13 +33,6 @@ class QuickDjangoTest(object):
         self.apps = args
         self._run_tests()
     
-    def _django_setup_required(self):
-        from django import VERSION
-        if VERSION[0] == 1 and VERSION[1] < 7:
-            return False
-        else:
-            return True
-    
     def __configure_settings(self):
         settings.configure(
             DEBUG = True,
@@ -67,8 +60,7 @@ class QuickDjangoTest(object):
     
     def _run_tests(self):
         self.__configure_settings()
-        if self._django_setup_required():
-            django.setup()
+        django.setup()
         from django.test.runner import DiscoverRunner
         failures = DiscoverRunner().run_tests(self.apps, verbosity=1)
         if failures:
