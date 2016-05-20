@@ -1,7 +1,7 @@
-from django.db import connection
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import User
 from django.contrib.auth.backends import RemoteUserBackend
 from django.conf import settings
+
 
 class ShibbolethRemoteUserBackend(RemoteUserBackend):
     """
@@ -31,9 +31,9 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
         """
         if not remote_user:
             return
-        user = None
         username = self.clean_username(remote_user)
-        shib_user_params = dict([(k, shib_meta[k]) for k in User._meta.get_all_field_names() if k in shib_meta])
+        field_names = [x.name for x in User._meta.get_fields()]
+        shib_user_params = dict([(k, shib_meta[k]) for k in field_names if k in shib_meta])
         # Note that this could be accomplished in one try-except clause, but
         # instead we use get_or_create when creating unknown users since it has
         # built-in safeguards for multiple threads.
@@ -45,5 +45,10 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
             try:
                 user = User.objects.get(username=username)
             except User.DoesNotExist:
-                pass
+                return
+        # After receiving a valid user, we update the the user attributes according to the shibboleth
+        # parameters. Otherwise the parameters (like mail address, sure_name or last_name) will always
+        # be the initial values from the first login
+        user.__dict__.update(**shib_user_params)
+        user.save()
         return user
