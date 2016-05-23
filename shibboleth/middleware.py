@@ -4,6 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, LOGOUT_SESSION_KEY
 
+
 class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
     """
     Authentication Middleware for use with Shibboleth.  Uses the recommended pattern
@@ -19,15 +20,15 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
                 " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
                 " before the RemoteUserMiddleware class.")
 
-        #To support logout.  If this variable is True, do not
-        #authenticate user and return now.
-        if request.session.get(LOGOUT_SESSION_KEY) == True:
+        # To support logout.  If this variable is True, do not
+        # authenticate user and return now.
+        if request.session.get(LOGOUT_SESSION_KEY):
             return
         else:
-            #Delete the shib reauth session key if present.
-	        request.session.pop(LOGOUT_SESSION_KEY, None)
+            # Delete the shib reauth session key if present.
+            request.session.pop(LOGOUT_SESSION_KEY, None)
 
-        #Locate the remote user header.
+        # Locate the remote user header.
         try:
             username = request.META[self.header]
         except KeyError:
@@ -62,7 +63,7 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             user.save()
             # call make profile.
             self.make_profile(user, shib_meta)
-            #setup session.
+            # setup session.
             self.setup_session(request)
 
     def make_profile(self, user, shib_meta):
@@ -80,9 +81,10 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
         """
         return
 
-    def parse_attributes(self, request):
+    @staticmethod
+    def parse_attributes(request):
         """
-        Parse the incoming Shibboleth attributes.
+        Parse the incoming Shibboleth attributes and convert them to the internal data structure.
         From: https://github.com/russell/django-shibboleth/blob/master/django_shibboleth/utils.py
         Pull the mapped attributes from the apache headers.
         """
@@ -97,6 +99,7 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
                 if required:
                     error = True
         return shib_attrs, error
+
 
 class ShibbolethValidationError(Exception):
     pass
