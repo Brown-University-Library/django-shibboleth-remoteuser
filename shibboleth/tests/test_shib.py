@@ -3,7 +3,7 @@ import os
 
 from django.conf import settings
 from django.contrib import auth
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.test import TestCase, RequestFactory
 
 
@@ -28,7 +28,7 @@ SAMPLE_HEADERS = {
   "Shibboleth-persistent-id": "https://sso.college.edu/idp/shibboleth!https://server.college.edu/shibboleth-sp!sk1Z9qKruvXY7JXvsq4GRb8GCUk=", 
   "Shibboleth-sn": "Developer", 
   "Shibboleth-title": "Library Developer", 
-  "Shibboleth-unscoped-affiliation": "member;staff"
+  "Shibboleth-unscoped-affiliation": "member;staff",
 }
 
 settings.SHIBBOLETH_ATTRIBUTE_MAP = {
@@ -58,7 +58,8 @@ settings.SHIBBOLETH_LOGOUT_URL = 'https://sso.school.edu/logout?next=%s'
 settings.SHIBBOLETH_LOGOUT_REDIRECT_URL = 'http://school.edu/'
 
 # MUST be imported after the settings above
-from shibboleth.middleware import ShibbolethRemoteUserMiddleware
+from shibboleth import app_settings
+from shibboleth import middleware
 from shibboleth import backends
 
 
@@ -97,7 +98,7 @@ class TestShibbolethRemoteUserBackend(TestCase):
         request_factory = RequestFactory()
         test_request = request_factory.get(location)
         test_request.META.update(**SAMPLE_HEADERS)
-        shib_meta, error = ShibbolethRemoteUserMiddleware.parse_attributes(test_request)
+        shib_meta, error = middleware.ShibbolethRemoteUserMiddleware.parse_attributes(test_request)
         self.assertFalse(error, 'Generating shibboleth attribute mapping contains errors')
         return shib_meta
 
@@ -134,10 +135,67 @@ class TestShibbolethRemoteUserBackend(TestCase):
         self.assertEqual(user2.email, 'Sample_Developer@school.edu')
 
 
+class TestShibbolethGroupAssignment(TestCase):
+
+    def test_unconfigured_group(self):
+        # by default SHIBBOLETH_GROUP_ATTRIBUTES = [] - so no groups will be touched
+        with self.settings(SHIBBOLETH_GROUP_ATTRIBUTES=[]):
+            reload(app_settings)
+            reload(middleware)
+            # After login the user will be created
+            self.client.get('/', **SAMPLE_HEADERS)
+            query = User.objects.filter(username='sampledeveloper@school.edu')
+            # Ensure the user was created
+            self.assertEqual(len(query), 1)
+            user = User.objects.get(username='sampledeveloper@school.edu')
+            # The user should have no groups
+            self.assertEqual(len(user.groups.all()), 0)
+            # Create a group and add the user
+            g = Group(name='Testgroup')
+            g.save()
+            # Now we should have exactly one group
+            self.assertEqual(len(Group.objects.all()), 1)
+            g.user_set.add(user)
+            # Now the user should be in exactly one group
+            self.assertEqual(len(user.groups.all()), 1)
+            self.client.get('/', **SAMPLE_HEADERS)
+            # After a request the user should still be in the group.
+            self.assertEqual(len(user.groups.all()), 1)
+
+    def test_group_creation(self):
+        # Test for group creation
+        with self.settings(SHIBBOLETH_GROUP_ATTRIBUTES=['Shibboleth-affiliation']):
+            reload(app_settings)
+            reload(middleware)
+            self.client.get('/', **SAMPLE_HEADERS)
+            user = User.objects.get(username='sampledeveloper@school.edu')
+            self.assertEqual(len(Group.objects.all()), 2)
+            self.assertEqual(len(user.groups.all()), 2)
+
+    def test_group_creation_list(self):
+        # Test for group creation from a list of group attributes
+        with self.settings(SHIBBOLETH_GROUP_ATTRIBUTES=['Shibboleth-affiliation', 'Shibboleth-isMemberOf']):
+            reload(app_settings)
+            reload(middleware)
+            self.client.get('/', **SAMPLE_HEADERS)
+            user = User.objects.get(username='sampledeveloper@school.edu')
+            self.assertEqual(len(Group.objects.all()), 6)
+            self.assertEqual(len(user.groups.all()), 6)
+
+    def test_empty_group_attribute(self):
+        # Test everthing is working even if the group attribute is missing in the shibboleth data
+        with self.settings(SHIBBOLETH_GROUP_ATTRIBUTES=['Shibboleth-not-existing-attribute']):
+            reload(app_settings)
+            reload(middleware)
+            self.client.get('/', **SAMPLE_HEADERS)
+            user = User.objects.get(username='sampledeveloper@school.edu')
+            self.assertEqual(len(Group.objects.all()), 0)
+            self.assertEqual(len(user.groups.all()), 0)
+
+
 class LogoutTest(TestCase):
 
     def test_logout(self):
-        from shibboleth import app_settings
         # Login
         login = self.client.get('/', **SAMPLE_HEADERS)
         self.assertEqual(login.status_code, 200)

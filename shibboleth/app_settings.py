@@ -16,6 +16,9 @@ LOGIN_URL = getattr(settings, 'LOGIN_URL', None)
 if not LOGIN_URL:
     raise ImproperlyConfigured("A LOGIN_URL is required.  Specify in settings.py")
 
+# This list of attributes will map to Django permission groups
+GROUP_ATTRIBUTES = getattr(settings, 'SHIBBOLETH_GROUP_ATTRIBUTES', [])
+
 #Optional logout parameters
 #This should look like: https://sso.school.edu/idp/logout.jsp?return=%s
 #The return url variable will be replaced in the LogoutView.
