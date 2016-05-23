@@ -5,8 +5,8 @@ import os
 from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.models import User
-from django.test import TestCase
-from django.test.client import Client
+from django.test import TestCase, RequestFactory
+
 
 SAMPLE_HEADERS = {
   "REMOTE_USER": 'sampledeveloper@school.edu',
@@ -41,7 +41,6 @@ settings.SHIBBOLETH_ATTRIBUTE_MAP = {
    "Shib-Session-ID": (True, "session_id"),
    "Shibboleth-givenName": (True, "first_name"),
    "Shibboleth-sn": (True, "last_name"),
-   "Shibboleth-mail": (True, "email"),
    "Shibboleth-schoolBarCode": (False, "barcode")
 }
 
@@ -59,17 +58,18 @@ settings.ROOT_URLCONF = 'shibboleth.urls'
 settings.SHIBBOLETH_LOGOUT_URL = 'https://sso.school.edu/logout?next=%s'
 settings.SHIBBOLETH_LOGOUT_REDIRECT_URL = 'http://school.edu/'
 
-from shibboleth.views import ShibbolethView
+# MUST be imported after the settings above
+from shibboleth.middleware import ShibbolethRemoteUserMiddleware
 from shibboleth import backends
 
 
 try:
-    from importlib import reload #python 3.4+
+    from importlib import reload  # python 3.4+
 except ImportError:
     try:
-        from imp import reload #for python 3.2/3.3
+        from imp import reload # for python 3.2/3.3
     except ImportError:
-        pass #this means we're on python 2, where reload is a builtin function
+        pass # this means we're on python 2, where reload is a builtin function
 
 
 def read(fname):
@@ -81,13 +81,13 @@ class AttributesTest(TestCase):
     def test_decorator_not_authenticated(self):
         resp = self.client.get('/')
         self.assertEqual(resp.status_code, 302)
-        #Test the context - shouldn't exist
+        # Test the context - shouldn't exist
         self.assertEqual(resp.context, None) 
         
     def test_decorator_authenticated(self):
         resp = self.client.get('/', **SAMPLE_HEADERS)
         self.assertEqual(resp.status_code, 200)
-        #Test the context
+        # Test the context
         user = resp.context.get('user')
         self.assertEqual(user.email, 'Sample_Developer@school.edu')
         self.assertEqual(user.first_name, 'Sample')
@@ -98,43 +98,66 @@ class AttributesTest(TestCase):
 
 class TestShibbolethRemoteUserBackend(TestCase):
 
+    def _get_valid_shib_meta(self, location='/'):
+        request_factory = RequestFactory()
+        test_request = request_factory.get(location)
+        test_request.META.update(**SAMPLE_HEADERS)
+        shib_meta, error = ShibbolethRemoteUserMiddleware.parse_attributes(test_request)
+        self.assertFalse(error, 'Generating shibboleth attribute mapping contains errors')
+        return shib_meta
+
     def test_create_unknown_user_true(self):
         self.assertFalse(User.objects.all())
-        user = auth.authenticate(remote_user='sampledeveloper@school.edu', shib_meta=SAMPLE_HEADERS)
+        shib_meta = self._get_valid_shib_meta()
+        user = auth.authenticate(remote_user='sampledeveloper@school.edu', shib_meta=shib_meta)
         self.assertEqual(user.username, 'sampledeveloper@school.edu')
         self.assertEqual(User.objects.all()[0].username, 'sampledeveloper@school.edu')
 
     def test_create_unknown_user_false(self):
         with self.settings(CREATE_UNKNOWN_USER=False):
-            #reload our shibboleth.backends module, so it picks up the settings change
+            # reload our shibboleth.backends module, so it picks up the settings change
             reload(backends)
+            shib_meta = self._get_valid_shib_meta()
             self.assertFalse(User.objects.all())
-            user = auth.authenticate(remote_user='sampledeveloper@school.edu', shib_meta=SAMPLE_HEADERS)
+            user = auth.authenticate(remote_user='sampledeveloper@school.edu', shib_meta=shib_meta)
             self.assertTrue(user is None)
             self.assertFalse(User.objects.all())
-        #now reload again, so it reverts to original settings
+        # now reload again, so it reverts to original settings
         reload(backends)
+
+    def test_ensure_user_attributes(self):
+        shib_meta = self._get_valid_shib_meta()
+        # Create / authenticate the test user and store another mail address
+        user = auth.authenticate(remote_user='sampledeveloper@school.edu', shib_meta=shib_meta)
+        user.email = 'invalid_email@school.edu'
+        user.save()
+        # The user must contain the invalid mail address
+        user = User.objects.get(username='sampledeveloper@school.edu')
+        self.assertEqual(user.email, 'invalid_email@school.edu')
+        # After authenticate the user again, the mail address must be set back to the shibboleth data
+        user2 = auth.authenticate(remote_user='sampledeveloper@school.edu', shib_meta=shib_meta)
+        self.assertEqual(user2.email, 'Sample_Developer@school.edu')
 
 
 class LogoutTest(TestCase):
 
     def test_logout(self):
         from shibboleth import app_settings
-        #Login
+        # Login
         login = self.client.get('/', **SAMPLE_HEADERS)
         self.assertEqual(login.status_code, 200)
-        #Logout
+        # Logout
         logout = self.client.get('/logout/', **SAMPLE_HEADERS)
         self.assertEqual(logout.status_code, 302)
-        #Ensure redirect happened.
+        # Ensure redirect happened.
         self.assertEqual(
             logout['Location'],
             'https://sso.school.edu/logout?next=http://school.edu/'
         )
-        #Check to see if the session has the force logout key.
+        # Check to see if the session has the force logout key.
         self.assertTrue(self.client.session.get(app_settings.LOGOUT_SESSION_KEY))
-        #Load root url to see if user is in fact logged out.
+        # Load root url to see if user is in fact logged out.
         resp = self.client.get('/', **SAMPLE_HEADERS)
         self.assertEqual(resp.status_code, 302)
-        #Make sure the context is empty.
+        # Make sure the context is empty.
         self.assertEqual(resp.context, None)
