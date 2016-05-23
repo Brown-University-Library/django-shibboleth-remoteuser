@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import os
 
 from django.conf import settings
@@ -70,10 +69,6 @@ except ImportError:
         from imp import reload # for python 3.2/3.3
     except ImportError:
         pass # this means we're on python 2, where reload is a builtin function
-
-
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 
 class AttributesTest(TestCase):
