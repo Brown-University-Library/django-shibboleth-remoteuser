@@ -48,7 +48,8 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
                 return
         # After receiving a valid user, we update the the user attributes according to the shibboleth
         # parameters. Otherwise the parameters (like mail address, sure_name or last_name) will always
-        # be the initial values from the first login
-        user.__dict__.update(**shib_user_params)
-        user.save()
+        # be the initial values from the first login. Only save user object if there are any changes.
+        if not min([getattr(user, k) == v for k, v in shib_user_params.items()]):
+            user.__dict__.update(**shib_user_params)
+            user.save()
         return user
