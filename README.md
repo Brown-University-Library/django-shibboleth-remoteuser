@@ -104,9 +104,9 @@ At this point, the django-shibboleth-remoteuser middleware should be complete.
    ```
 
 ### Permission group mapping
- * It is possible to map a list of attributes to Django permission groups. ```django-shibboleth-remoteuser``` will generate the groups from the semicolon-separated values of this attributes. They will be available in the Django admin interface and you can assign your application permission to them.
+ * It is possible to map a list of attributes to Django permission groups. ```django-shibboleth-remoteuser``` will generate the groups from the semicolon-separated values of these attributes. They will be available in the Django admin interface and you can assign your application permissions to them.
 
    ```python
    SHIBBOLETH_GROUP_ATTRIBUTES = ['Shibboleth-affiliation', 'Shibboleth-isMemberOf']
    ```
- By default this value is empty and will not affect your group settings. But when you add attributes to ```SHIBBOLETH_GROUP_ATTRIBUTES``` the user will only associated with those groups. Be aware that the user will removed from groups not defined in ```SHIBBOLETH_GROUP_ATTRIBUTES```, if you enable this setting. Some installations may create a lot of groups. You may check your group attributes at [https://your_domain.edu/Shibboleth.sso/Session]() before activating this feature.
+ By default this value is empty and will not affect your group settings. But when you add attributes to ```SHIBBOLETH_GROUP_ATTRIBUTES``` the user will only associated with those groups. Be aware that the user will be removed from groups not defined in ```SHIBBOLETH_GROUP_ATTRIBUTES```, if you enable this setting. Some installations may create a lot of groups. You may check your group attributes at [https://your_domain.edu/Shibboleth.sso/Session]() before activating this feature.
