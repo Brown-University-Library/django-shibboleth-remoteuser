@@ -96,12 +96,23 @@ At this point, the django-shibboleth-remoteuser middleware should be complete.
 ### Template tags
  * Template tags are included which will allow you to place {{ login_link }} or {{ logout_link }} in your templates for routing users to the login or logout page.  These are available as a convenience and not required.  To activate add the following to settings.py.
 
-   ```python
-    TEMPLATE_CONTEXT_PROCESSORS += (
-       'shibboleth.context_processors.login_link',
-       'shibboleth.context_processors.logout_link'
-    )
-   ```
+    ```python
+    TEMPLATES = [
+        {
+	...
+            'OPTIONS': {
+                'context_processors': [
+		    ...
+		    'shibboleth.context_processors.login_link',
+		    'shibboleth.context_processors.logout_link',
+		    ...
+                ],
+            },
+	...
+        },
+    ]
+    ```
+
 
 ### Permission group mapping
  * It is possible to map a list of attributes to Django permission groups. ```django-shibboleth-remoteuser``` will generate the groups from the semicolon-separated values of these attributes. They will be available in the Django admin interface and you can assign your application permissions to them.
