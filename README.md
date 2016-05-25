@@ -40,7 +40,7 @@ Installation and configuration
   * Map Shibboleth attributes to Django User models. The attributes must be stated in the form they have in the HTTP headers.
     Use this to populate the Django User object from Shibboleth attributes.
 
-    The first element of the tuple states if the attribute is required or not. If a reqired element is not found in the parsed 
+    The first element of the tuple states if the attribute is required or not. If a reqired element is not found in the parsed
     Shibboleth headers, an exception will be raised.
     (True, "required_attribute")
     (False, "optional_attribute).
@@ -92,8 +92,8 @@ If you would like to verify that everything is configured correctly, follow the 
 
 At this point, the django-shibboleth-remoteuser middleware should be complete.
 
-##Optional
-###Template tags
+## Optional
+### Template tags
  * Template tags are included which will allow you to place {{ login_link }} or {{ logout_link }} in your templates for routing users to the login or logout page.  These are available as a convenience and not required.  To activate add the following to settings.py.
 
    ```python
@@ -103,4 +103,10 @@ At this point, the django-shibboleth-remoteuser middleware should be complete.
     )
    ```
 
+### Permission group mapping
+ * It is possible to map a list of attributes to Django permission groups. ```django-shibboleth-remoteuser``` will generate the groups from the semicolon-separated values of these attributes. They will be available in the Django admin interface and you can assign your application permissions to them.
 
+   ```python
+   SHIBBOLETH_GROUP_ATTRIBUTES = ['Shibboleth-affiliation', 'Shibboleth-isMemberOf']
+   ```
+ By default this value is empty and will not affect your group settings. But when you add attributes to ```SHIBBOLETH_GROUP_ATTRIBUTES``` the user will only associated with those groups. Be aware that the user will be removed from groups not defined in ```SHIBBOLETH_GROUP_ATTRIBUTES```, if you enable this setting. Some installations may create a lot of groups. You may check your group attributes at [https://your_domain.edu/Shibboleth.sso/Session]() before activating this feature.

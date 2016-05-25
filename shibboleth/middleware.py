@@ -1,8 +1,9 @@
 from django.contrib.auth.middleware import RemoteUserMiddleware
+from django.contrib.auth.models import Group
 from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
 
-from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, LOGOUT_SESSION_KEY
+from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, GROUP_ATTRIBUTES, LOGOUT_SESSION_KEY
 
 
 class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
@@ -61,6 +62,10 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             auth.login(request, user)
             user.set_unusable_password()
             user.save()
+            # Upgrade user groups if configured in the settings.py
+            # If activated, the user will be associated with those groups.
+            if GROUP_ATTRIBUTES:
+                self.update_user_groups(request, user)
             # call make profile.
             self.make_profile(user, shib_meta)
             # setup session.
@@ -81,6 +86,17 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
         """
         return
 
+    def update_user_groups(self, request, user):
+        groups = self.parse_group_attributes(request)
+        # Remove the user from all groups that are not specified in the shibboleth metadata
+        for group in user.groups.all():
+            if group.name not in groups:
+                group.user_set.remove(user)
+        # Add the user to all groups in the shibboleth metadata
+        for g in groups:
+            group, created = Group.objects.get_or_create(name=g)
+            group.user_set.add(user)
+
     @staticmethod
     def parse_attributes(request):
         """
@@ -99,6 +115,16 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
                 if required:
                     error = True
         return shib_attrs, error
+
+    @staticmethod
+    def parse_group_attributes(request):
+        """
+        Parse the Shibboleth attributes for the GROUP_ATTRIBUTES and generate a list of them.
+        """
+        groups = []
+        for attr in GROUP_ATTRIBUTES:
+            groups += filter(bool, request.META.get(attr, '').split(';'))
+        return groups
 
 
 class ShibbolethValidationError(Exception):
