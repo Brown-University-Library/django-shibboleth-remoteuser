@@ -19,7 +19,7 @@ Installation and configuration
 
     ```python
     AUTHENTICATION_BACKENDS += (
-      'shibboleth.backends.ShibbolethRemoteUserBackend',
+        'shibboleth.backends.ShibbolethRemoteUserBackend',
     )
     ```
 
@@ -29,10 +29,10 @@ Installation and configuration
 
    ```python
     MIDDLEWARE_CLASSES = (
-    ...
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
-    ...
+        ...
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
+        ...
     )
     ```
 
@@ -47,10 +47,10 @@ Installation and configuration
 
     ```python
     SHIBBOLETH_ATTRIBUTE_MAP = {
-       "shib-user": (True, "username"),
-       "shib-given-name": (True, "first_name"),
-       "shib-sn": (True, "last_name"),
-       "shib-mail": (False, "email"),
+        "shib-user": (True, "username"),
+        "shib-given-name": (True, "first_name"),
+        "shib-sn": (True, "last_name"),
+        "shib-mail": (False, "email"),
     }
     ```
 
@@ -78,16 +78,16 @@ If you would like to verify that everything is configured correctly, follow the 
 
     ```python
     INSTALLED_APPS += (
-      'shibboleth',
+        'shibboleth',
     )
     ```
 
  * Add below to urls.py to enable the included sample view.  This view just echos back the parsed user attributes, which can be helpful for testing.
 
     ```python
-    urlpatterns += patterns('',
-      url(r'^shib/', include('shibboleth.urls', namespace='shibboleth')),
-    )
+    urlpatterns += [
+        url(r'^shib/', include('shibboleth.urls', namespace='shibboleth')),
+    ]
     ```
 
 At this point, the django-shibboleth-remoteuser middleware should be complete.
