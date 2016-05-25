@@ -27,14 +27,14 @@ Installation and configuration
     You must add the django.contrib.auth.middleware.ShibbolethRemoteUserMiddleware to the MIDDLEWARE_CLASSES setting after the django.contrib.auth.middleware.AuthenticationMiddleware.
     For example:
 
-   ```python
-    MIDDLEWARE_CLASSES = (
-        ...
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
-        ...
-    )
-    ```
+    ```python
+     MIDDLEWARE_CLASSES = (
+         ...
+         'django.contrib.auth.middleware.AuthenticationMiddleware',
+         'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
+         ...
+     )
+     ```
 
 
   * Map Shibboleth attributes to Django User models. The attributes must be stated in the form they have in the HTTP headers.
@@ -58,9 +58,9 @@ Installation and configuration
 
   * Login url - set this to the login handler of your shibboleth installation. In most cases, this will be something like:
 
-   ```python
-   LOGIN_URL = 'https://your_domain.edu/Shibboleth.sso/Login'
-   ```
+    ```python
+    LOGIN_URL = 'https://your_domain.edu/Shibboleth.sso/Login'
+    ```
 
  * Apache configuration - make sure the shibboleth attributes are available to the app.  The app url doesn't need to require Shibboleth.  
 
