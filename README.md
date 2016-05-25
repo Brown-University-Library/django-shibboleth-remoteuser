@@ -19,20 +19,19 @@ Installation and configuration
 
     ```python
     AUTHENTICATION_BACKENDS += (
-      'shibboleth.backends.ShibbolethRemoteUserBackend',
+        'shibboleth.backends.ShibbolethRemoteUserBackend',
     )
     ```
 
   * Add the Django Shibboleth middleware.
-    You must add the django.contrib.auth.middleware.ShibbolethRemoteUserMiddleware to the MIDDLEWARE_CLASSES setting after the django.contrib.auth.middleware.AuthenticationMiddleware.
-    For example:
+    You must add the django.contrib.auth.middleware.ShibbolethRemoteUserMiddleware to the MIDDLEWARE_CLASSES setting after the django.contrib.auth.middleware.AuthenticationMiddleware. For example:
 
-   ```python
+    ```python
     MIDDLEWARE_CLASSES = (
-    ...
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
-    ...
+        ...
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
+        ...
     )
     ```
 
@@ -47,10 +46,10 @@ Installation and configuration
 
     ```python
     SHIBBOLETH_ATTRIBUTE_MAP = {
-       "shib-user": (True, "username"),
-       "shib-given-name": (True, "first_name"),
-       "shib-sn": (True, "last_name"),
-       "shib-mail": (False, "email"),
+        "shib-user": (True, "username"),
+        "shib-given-name": (True, "first_name"),
+        "shib-sn": (True, "last_name"),
+        "shib-mail": (False, "email"),
     }
     ```
 
@@ -58,9 +57,9 @@ Installation and configuration
 
   * Login url - set this to the login handler of your shibboleth installation. In most cases, this will be something like:
 
-   ```python
-   LOGIN_URL = 'https://your_domain.edu/Shibboleth.sso/Login'
-   ```
+    ```python
+    LOGIN_URL = 'https://your_domain.edu/Shibboleth.sso/Login'
+    ```
 
  * Apache configuration - make sure the shibboleth attributes are available to the app.  The app url doesn't need to require Shibboleth.  
 
@@ -78,16 +77,16 @@ If you would like to verify that everything is configured correctly, follow the 
 
     ```python
     INSTALLED_APPS += (
-      'shibboleth',
+        'shibboleth',
     )
     ```
 
  * Add below to urls.py to enable the included sample view.  This view just echos back the parsed user attributes, which can be helpful for testing.
 
     ```python
-    urlpatterns += patterns('',
-      url(r'^shib/', include('shibboleth.urls', namespace='shibboleth')),
-    )
+    urlpatterns += [
+        url(r'^shib/', include('shibboleth.urls', namespace='shibboleth')),
+    ]
     ```
 
 At this point, the django-shibboleth-remoteuser middleware should be complete.
@@ -96,12 +95,23 @@ At this point, the django-shibboleth-remoteuser middleware should be complete.
 ### Template tags
  * Template tags are included which will allow you to place {{ login_link }} or {{ logout_link }} in your templates for routing users to the login or logout page.  These are available as a convenience and not required.  To activate add the following to settings.py.
 
-   ```python
-    TEMPLATE_CONTEXT_PROCESSORS += (
-       'shibboleth.context_processors.login_link',
-       'shibboleth.context_processors.logout_link'
-    )
-   ```
+    ```python
+    TEMPLATES = [
+        {
+        ...
+            'OPTIONS': {
+                'context_processors': [
+                    ...
+                    'shibboleth.context_processors.login_link',
+                    'shibboleth.context_processors.logout_link',
+                    ...
+                ],
+            },
+        ...
+        },
+    ]
+    ```
+
 
 ### Permission group mapping
  * It is possible to map a list of attributes to Django permission groups. ```django-shibboleth-remoteuser``` will generate the groups from the semicolon-separated values of these attributes. They will be available in the Django admin interface and you can assign your application permissions to them.
