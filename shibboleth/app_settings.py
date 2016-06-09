@@ -4,7 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 #At a minimum you will need username, 
 default_shib_attributes = {
-  "Shibboleth-eppn": (True, "username"),
+  "REMOTE_USER": (True, "username"),
 } 
 
 SHIB_ATTRIBUTE_MAP = getattr(settings, 'SHIBBOLETH_ATTRIBUTE_MAP', default_shib_attributes)
