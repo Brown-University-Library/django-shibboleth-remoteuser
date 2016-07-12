@@ -58,18 +58,6 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
         if user:
             # User is valid.  Set request.user and persist user in the session
             # by logging the user in.
-            
-            """
-            @note: setting password for user needs to be before auth.login() 
-            because get_session_auth_hash() returns the salted_hmac value of salt and password.
-            If it remains after the auth.login() it will return a different auth_hash 
-            than what's stored in session "request.session[HASH_SESSION_KEY]".
-            Also we don't need to update the user's password everytime he logs in.
-            """
-            if not user.password:
-                user.set_unusable_password()
-                user.save()
-            
             request.user = user
             auth.login(request, user)
             
