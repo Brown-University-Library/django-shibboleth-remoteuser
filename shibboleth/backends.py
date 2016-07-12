@@ -40,6 +40,15 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
         if self.create_unknown_user:
             user, created = User.objects.get_or_create(username=username, defaults=shib_user_params)
             if created:
+                """
+                @note: setting password for user needs on initial creation of user instead of after auth.login() of middleware.
+                because get_session_auth_hash() returns the salted_hmac value of salt and password.
+                If it remains after the auth.login() it will return a different auth_hash 
+                than what's stored in session "request.session[HASH_SESSION_KEY]".
+                Also we don't need to update the user's password everytime he logs in.
+                """
+                user.set_unusable_password()
+                user.save()
                 user = self.configure_user(user)
         else:
             try:

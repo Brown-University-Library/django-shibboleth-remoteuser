@@ -60,8 +60,7 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             # by logging the user in.
             request.user = user
             auth.login(request, user)
-            user.set_unusable_password()
-            user.save()
+            
             # Upgrade user groups if configured in the settings.py
             # If activated, the user will be associated with those groups.
             if GROUP_ATTRIBUTES:
