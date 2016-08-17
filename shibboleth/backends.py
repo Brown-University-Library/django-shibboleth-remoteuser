@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import RemoteUserBackend
 from django.conf import settings
 
@@ -31,6 +31,7 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
         """
         if not remote_user:
             return
+        User = get_user_model()
         username = self.clean_username(remote_user)
         field_names = [x.name for x in User._meta.get_fields()]
         shib_user_params = dict([(k, shib_meta[k]) for k in field_names if k in shib_meta])
@@ -43,7 +44,7 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
                 """
                 @note: setting password for user needs on initial creation of user instead of after auth.login() of middleware.
                 because get_session_auth_hash() returns the salted_hmac value of salt and password.
-                If it remains after the auth.login() it will return a different auth_hash 
+                If it remains after the auth.login() it will return a different auth_hash
                 than what's stored in session "request.session[HASH_SESSION_KEY]".
                 Also we don't need to update the user's password everytime he logs in.
                 """
