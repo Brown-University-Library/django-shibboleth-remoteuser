@@ -26,7 +26,6 @@ class QuickDjangoTest(object):
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
-        'django.contrib.admin',
     )
     
     def __init__(self, *args, **kwargs):
@@ -56,6 +55,14 @@ class QuickDjangoTest(object):
                     'django.middleware.clickjacking.XFrameOptionsMiddleware',
                 ),
 	    ROOT_URLCONF = 'shib.urls',
+            TEMPLATES = [
+                {
+                    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                    'DIRS': [],
+                    'APP_DIRS': True,
+                    'OPTIONS': {},
+                },
+            ],
         )
     
     def _run_tests(self):
