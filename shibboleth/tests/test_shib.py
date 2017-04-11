@@ -3,7 +3,10 @@ import os
 
 from django.conf import settings
 from django.contrib import auth
+from django.contrib.auth.middleware import AuthenticationMiddleware
+from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User, Group
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase, RequestFactory
 
 
@@ -90,6 +93,35 @@ class AttributesTest(TestCase):
         self.assertEqual(user.last_name, 'Developer')
         self.assertTrue(user.is_authenticated())
         self.assertFalse(user.is_anonymous())
+
+
+class TestShibbolethRemoteUserMiddleware(TestCase):
+
+    def setUp(self):
+        self.request_factory = RequestFactory()
+        self.smw = SessionMiddleware()
+        self.amw = AuthenticationMiddleware()
+        self.rmw = RemoteUserMiddleware()
+        self.srmw = middleware.ShibbolethRemoteUserMiddleware()
+
+    def _process_request_through_middleware(self, request):
+        self.smw.process_request(request)
+        self.amw.process_request(request)
+        self.rmw.process_request(request)
+        return self.srmw.process_request(request)
+
+    def test_no_remote_user(self):
+        test_request = self.request_factory.get('/')
+        self._process_request_through_middleware(test_request)
+        #shouldn't have done anything - just return because no REMOTE_USER
+        self.assertTrue('shib' not in test_request.session)
+        self.assertFalse(test_request.user.is_authenticated())
+
+    def test_remote_user_empty(self):
+        test_request = self.request_factory.get('/', REMOTE_USER='')
+        response = self._process_request_through_middleware(test_request)
+        self.assertTrue('shib' not in test_request.session)
+        self.assertFalse(test_request.user.is_authenticated())
 
 
 class TestShibbolethRemoteUserBackend(TestCase):

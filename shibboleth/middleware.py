@@ -37,6 +37,10 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             # request.user set to AnonymousUser by the
             # AuthenticationMiddleware).
             return
+        #If we got an empty value for request.META[self.header], treat it like
+        #   self.header wasn't in self.META at all - it's still an anonymous user.
+        if not username:
+            return
         # If the user is already authenticated and that user is the user we are
         # getting passed in the headers, then the correct user is already
         # persisted in the session and we don't need to continue.
