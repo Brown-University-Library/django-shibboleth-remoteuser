@@ -62,4 +62,15 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
         if not min([getattr(user, k) == v for k, v in shib_user_params.items()]):
             user.__dict__.update(**shib_user_params)
             user.save()
-        return user
+        return user if self.user_can_authenticate(user) else None
+
+    def user_can_authenticate(self, user):
+        """
+        Reject users with is_active=False. Custom user models that don't have
+        that attribute are allowed.
+
+        This is already provided in Django 1.10+ - included here to support
+        lower versions
+        """
+        is_active = getattr(user, 'is_active', None)
+        return is_active or is_active is None
