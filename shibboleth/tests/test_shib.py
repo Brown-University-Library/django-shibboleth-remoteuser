@@ -153,6 +153,13 @@ class TestShibbolethRemoteUserBackend(TestCase):
         # now reload again, so it reverts to original settings
         reload(backends)
 
+    def test_auth_inactive_user_false(self):
+        shib_meta = self._get_valid_shib_meta()
+        # Pre-create an inactive user
+        User.objects.create(username='sampledeveloper@school.edu', is_active=False)
+        user = auth.authenticate(remote_user='sampledeveloper@school.edu', shib_meta=shib_meta)
+        self.assertTrue(user is None)
+
     def test_ensure_user_attributes(self):
         shib_meta = self._get_valid_shib_meta()
         # Create / authenticate the test user and store another mail address
