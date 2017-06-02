@@ -33,7 +33,13 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
             return
         User = get_user_model()
         username = self.clean_username(remote_user)
-        field_names = [x.name for x in User._meta.get_fields()]
+
+        try:
+            field_names = [x.name for x in User._meta.get_fields()]
+        except AttributeError:
+            # Compatibility fix for Django 1.6.x
+            field_names = User._meta.get_all_field_names()
+
         shib_user_params = dict([(k, shib_meta[k]) for k in field_names if k in shib_meta])
         # Note that this could be accomplished in one try-except clause, but
         # instead we use get_or_create when creating unknown users since it has
