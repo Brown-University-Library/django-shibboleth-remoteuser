@@ -6,6 +6,13 @@ django-shibboleth-remoteuser
 Middleware for using Shibboleth with Django.
 Requires Django 1.3 or above for RemoteAuthMiddleware.
 
+Requirements
+------------
+
+* shibboleth-sp service installed on your system
+* shibboleth module enabled or compiled on your web server
+* Django >= 1.8 for version > 0.6 or Django > 1.3 for version <= 0.6
+
 Installation and configuration
 ------------------------------
 1.  Either checkout and run ``python setup.py install`` or install directly
