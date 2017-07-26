@@ -2,8 +2,9 @@ from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import Group
 from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
+import re
 
-from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, GROUP_ATTRIBUTES, LOGOUT_SESSION_KEY
+from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, GROUP_ATTRIBUTES, LOGOUT_SESSION_KEY, GROUP_DELIMITERS
 
 
 class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
@@ -126,7 +127,9 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
         """
         groups = []
         for attr in GROUP_ATTRIBUTES:
-            groups += filter(bool, request.META.get(attr, '').split(';'))
+            parsed_groups = re.split('|'.join(GROUP_DELIMITERS),
+                                     request.META.get(attr, ''))
+            groups += filter(bool, parsed_groups)
         return groups
 
 
