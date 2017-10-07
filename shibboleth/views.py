@@ -15,6 +15,13 @@ except ImportError:
 #Logout settings.
 from shibboleth.app_settings import LOGOUT_URL, LOGOUT_REDIRECT_URL
 
+#SLO (back-channel) / spyne stuff
+from spyne.model.primitive import Unicode
+#from spyne.model import XmlAttribute
+from spyne.service import Service
+from spyne.decorator import rpc
+from spyne import ComplexModel
+
 
 class ShibbolethView(TemplateView):
     """
@@ -76,3 +83,24 @@ class ShibbolethLogoutView(TemplateView):
                  quote(request.build_absolute_uri())
         logout = LOGOUT_URL % target
         return redirect(logout)
+
+
+class OKType(ComplexModel):
+    pass
+
+
+class MandatoryUnicode(Unicode):
+    class Attributes(Unicode.Attributes):
+        nullable = False
+        min_occurs = 1
+
+
+class LogoutNotificationService(Service):
+    @rpc(MandatoryUnicode, _returns=OKType,
+         _in_variable_names={'sessionid': 'SessionID'},
+         _out_variable_name='OK',
+         )
+    def LogoutNotification(ctx, sessionid):
+        #return 'Session: %s' % sessionid
+        #TODO Do logout stuff here - delete user session based on shib session
+        return True
