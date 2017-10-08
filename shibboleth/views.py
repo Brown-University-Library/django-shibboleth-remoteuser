@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
+from django.contrib.sessions.models import Session
 
 try:
     from django.utils.six.moves.urllib.parse import quote
@@ -14,6 +15,7 @@ except ImportError:
 
 #Logout settings.
 from shibboleth.app_settings import LOGOUT_URL, LOGOUT_REDIRECT_URL
+from shibboleth.models import ShibSession
 
 #SLO (back-channel) / spyne stuff
 from spyne.model.primitive import Unicode
@@ -21,6 +23,7 @@ from spyne.model.primitive import Unicode
 from spyne.service import Service
 from spyne.decorator import rpc
 from spyne import ComplexModel
+from spyne.model.fault import Fault
 
 
 class ShibbolethView(TemplateView):
@@ -101,6 +104,13 @@ class LogoutNotificationService(Service):
          _out_variable_name='OK',
          )
     def LogoutNotification(ctx, sessionid):
-        #return 'Session: %s' % sessionid
-        #TODO Do logout stuff here - delete user session based on shib session
-        return True
+        # delete user session based on shib session
+        try:
+            session_mapping = ShibSession.objects.get(shib=sessionid)
+        except:
+            # Can't delete session
+            raise Fault(faultcode='Client', faultstring='Invalid session id')
+        else:
+            # Deleting session
+            Session.objects.filter(session_key=session_mapping.session_id).delete()
+            return True

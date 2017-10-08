@@ -5,6 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 import re
 
 from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, GROUP_ATTRIBUTES, GROUP_DELIMITERS
+from shibboleth.models import ShibSession
 
 
 class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
@@ -57,7 +58,10 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             # by logging the user in.
             request.user = user
             auth.login(request, user)
-            
+
+            # store session mapping
+            ShibSession.objects.get_or_create(shib=request.META['Shib_Session_ID'], session_id=request.session.session_key)
+
             # Upgrade user groups if configured in the settings.py
             # If activated, the user will be associated with those groups.
             if GROUP_ATTRIBUTES:
