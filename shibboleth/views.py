@@ -13,7 +13,7 @@ except ImportError:
     from urllib import quote
 
 #Logout settings.
-from shibboleth.app_settings import LOGOUT_URL, LOGOUT_REDIRECT_URL, LOGOUT_SESSION_KEY
+from shibboleth.app_settings import LOGOUT_URL, LOGOUT_REDIRECT_URL
 
 
 class ShibbolethView(TemplateView):
@@ -55,7 +55,6 @@ class ShibbolethLoginView(TemplateView):
 
     def get(self, *args, **kwargs):
         #Remove session value that is forcing Shibboleth reauthentication.
-        self.request.session.pop(LOGOUT_SESSION_KEY, None)
         login = settings.LOGIN_URL + '?target=%s' % quote(self.request.GET.get(self.redirect_field_name, ''))
         return redirect(login)
 
@@ -71,9 +70,6 @@ class ShibbolethLogoutView(TemplateView):
     def get(self, request, *args, **kwargs):
         #Log the user out.
         auth.logout(self.request)
-        #Set session key that middleware will use to force 
-        #Shibboleth reauthentication.
-        self.request.session[LOGOUT_SESSION_KEY] = True
         #Get target url in order of preference.
         target = LOGOUT_REDIRECT_URL or\
                  quote(self.request.GET.get(self.redirect_field_name, '')) or\
