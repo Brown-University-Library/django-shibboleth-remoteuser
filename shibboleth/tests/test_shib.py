@@ -61,6 +61,7 @@ settings.ROOT_URLCONF = 'shibboleth.urls'
 
 settings.SHIBBOLETH_LOGOUT_URL = 'https://sso.school.edu/logout?next=%s'
 settings.SHIBBOLETH_LOGOUT_REDIRECT_URL = 'http://school.edu/'
+settings.SHIBBOLETH_SINGLE_LOGOUT_BACKCHANNEL = True
 
 # MUST be imported after the settings above
 from shibboleth import app_settings

@@ -30,3 +30,6 @@ LOGOUT_URL = getattr(settings, 'SHIBBOLETH_LOGOUT_URL', None)
 #LOGOUT_REDIRECT_URL specifies a default logout page that will always be used when
 #users logout from Shibboleth.
 LOGOUT_REDIRECT_URL = getattr(settings, 'SHIBBOLETH_LOGOUT_REDIRECT_URL', None)
+
+# back-channel SLO
+SINGLE_LOGOUT_BACKCHANNEL = getattr(settings, 'SHIBBOLETH_SINGLE_LOGOUT_BACKCHANNEL', False)
