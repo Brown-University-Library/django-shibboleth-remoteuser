@@ -26,6 +26,7 @@ class QuickDjangoTest(object):
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
+        'shibboleth',
     )
     
     def __init__(self, *args, **kwargs):
