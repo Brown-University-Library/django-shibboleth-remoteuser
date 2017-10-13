@@ -20,7 +20,11 @@ from shibboleth.models import ShibSession
 #SLO (back-channel) / spyne stuff
 from spyne.model.primitive import Unicode
 #from spyne.model import XmlAttribute
-from spyne.service import Service
+try:
+    from spyne.service import Service
+except ImportError:
+    from spyne.service import ServiceBase as Service
+
 from spyne.decorator import rpc
 from spyne import ComplexModel
 from spyne.model.fault import Fault
