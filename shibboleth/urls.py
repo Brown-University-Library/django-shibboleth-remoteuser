@@ -19,7 +19,5 @@ if SINGLE_LOGOUT_BACKCHANNEL:
         url(r'^logoutNotification/', DjangoView.as_view(
             services=[LogoutNotificationService],
             tns='urn:mace:shibboleth:2.0:sp:notify',
-            in_protocol=Soap11(), out_protocol=Soap11())),
-        #FIXME Soap11(validator='lxml') - validation would be nice,
-        # but needs adjusted model to support logout type attribute
+            in_protocol=Soap11(validator='lxml'), out_protocol=Soap11())),
     ]

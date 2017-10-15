@@ -2,7 +2,8 @@ from django.contrib.sessions.models import Session
 from shibboleth.models import ShibSession
 #SLO (back-channel) / spyne stuff
 from spyne.model.primitive import Unicode
-#from spyne.model import XmlAttribute
+from spyne.model import XmlAttribute
+from spyne.model.enum import Enum
 try:
     from spyne.service import Service
 except ImportError:
@@ -23,19 +24,29 @@ class MandatoryUnicode(Unicode):
         min_occurs = 1
 
 
+class LogoutRequest(ComplexModel):
+    __namespace__ = 'urn:mace:shibboleth:2.0:sp:notify'
+    SessionID = MandatoryUnicode
+    type = XmlAttribute(Enum("global", "local",
+                        type_name="LogoutNotificationType"))
+
+
+class LogoutResponse(ComplexModel):
+    __namespace__ = 'urn:mace:shibboleth:2.0:sp:notify'
+    OK = OKType
+
+
 class LogoutNotificationService(Service):
-    @rpc(MandatoryUnicode, _returns=OKType,
-         _in_variable_names={'sessionid': 'SessionID'},
-         _out_variable_name='OK',
-         )
-    def LogoutNotification(ctx, sessionid):
+    @rpc(LogoutRequest, _returns=LogoutResponse, _body_style='bare')
+    def LogoutNotification(ctx, req):
         # delete user session based on shib session
         try:
-            session_mapping = ShibSession.objects.get(shib=sessionid)
+            session_mapping = ShibSession.objects.get(shib=req.SessionID)
         except:
             # Can't delete session
             raise Fault(faultcode='Client', faultstring='Invalid session id')
         else:
             # Deleting session
-            Session.objects.filter(session_key=session_mapping.session_id).delete()
-            return True
+            Session.objects.filter(
+                session_key=session_mapping.session_id).delete()
+            return LogoutResponse
