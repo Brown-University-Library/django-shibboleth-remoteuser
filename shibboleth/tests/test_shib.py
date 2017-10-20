@@ -261,6 +261,9 @@ class LogoutTest(TestCase):
         # Login
         login = self.client.get('/', **SAMPLE_HEADERS)
         self.assertEqual(login.status_code, 200)
+        # Check login
+        login = self.client.get('/')
+        self.assertEqual(login.status_code, 200)
         # Logout
         logout = self.client.get('/logout/', **SAMPLE_HEADERS)
         self.assertEqual(logout.status_code, 302)
@@ -269,10 +272,8 @@ class LogoutTest(TestCase):
             logout['Location'],
             'https://sso.school.edu/logout?next=http://school.edu/'
         )
-        # Check to see if the session has the force logout key.
-        self.assertTrue(self.client.session.get(app_settings.LOGOUT_SESSION_KEY))
         # Load root url to see if user is in fact logged out.
-        resp = self.client.get('/', **SAMPLE_HEADERS)
+        resp = self.client.get('/')
         self.assertEqual(resp.status_code, 302)
         # Make sure the context is empty.
         self.assertEqual(resp.context, None)

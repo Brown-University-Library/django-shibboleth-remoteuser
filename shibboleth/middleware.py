@@ -4,7 +4,7 @@ from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
 import re
 
-from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, GROUP_ATTRIBUTES, LOGOUT_SESSION_KEY, GROUP_DELIMITERS
+from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, GROUP_ATTRIBUTES, GROUP_DELIMITERS
 
 
 class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
@@ -21,14 +21,6 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
                 " MIDDLEWARE_CLASSES setting to insert"
                 " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
                 " before the RemoteUserMiddleware class.")
-
-        # To support logout.  If this variable is True, do not
-        # authenticate user and return now.
-        if request.session.get(LOGOUT_SESSION_KEY):
-            return
-        else:
-            # Delete the shib reauth session key if present.
-            request.session.pop(LOGOUT_SESSION_KEY, None)
 
         # Locate the remote user header.
         try:
