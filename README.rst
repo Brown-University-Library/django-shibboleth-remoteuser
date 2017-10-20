@@ -165,6 +165,23 @@ You may check your group attributes at
 before activating this feature.
 
 
+Fields identified in ``SHIBBOLETH_GROUP_ATTRIBUTES`` can be a string of group
+names with a delimiter. By default the delimiter is `;`, but this can be
+overridden to be one or many delimiters using the ``SHIBBOLETH_GROUP_DELIMITERS``
+setting.
+
+For example, given:
+  - ``SHIBBOLETH_GROUP_ATTRIBUTES = ['Shibboleth-isMemberOf']``
+  - request headers includes: ``Shibboleth-isMemberOf: 'users;admins,managers'``
+
+=========================== =======================================
+SHIBBOLETH_GROUP_DELIMITERS Parsed Groups
+=========================== =======================================
+default                     ``users`` and ``admins,managers``
+``[',']``                   ``users;admins`` and ``managers``
+``[',', ';']``              ``users``, ``admins``, and ``managers``
+=========================== =======================================
+
 .. |build-status| image:: https://travis-ci.org/Brown-University-Library/django-shibboleth-remoteuser.svg?branch=master&style=flat
    :target: https://travis-ci.org/Brown-University-Library/django-shibboleth-remoteuser
    :alt: Build status

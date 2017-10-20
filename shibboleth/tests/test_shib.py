@@ -27,6 +27,7 @@ SAMPLE_HEADERS = {
   "Shibboleth-eppn": "sampledeveloper@school.edu", 
   "Shibboleth-givenName": "Sample", 
   "Shibboleth-isMemberOf": "SCHOOL:COMMUNITY:EMPLOYEE:ADMINISTRATIVE:BASE;SCHOOL:COMMUNITY:EMPLOYEE:STAFF:SAC:P;COMMUNITY:ALL;SCHOOL:COMMUNITY:EMPLOYEE:STAFF:SAC:M;", 
+  "Shibboleth-isMemberOf-multi-delimiter": "SCHOOL:COMMUNITY:EMPLOYEE:ADMINISTRATIVE:BASE,SCHOOL:COMMUNITY:EMPLOYEE:STAFF:SAC:P,COMMUNITY:ALL;SCHOOL:COMMUNITY:EMPLOYEE:STAFF:SAC:M,",
   "Shibboleth-mail": "Sample_Developer@school.edu", 
   "Shibboleth-persistent-id": "https://sso.college.edu/idp/shibboleth!https://server.college.edu/shibboleth-sp!sk1Z9qKruvXY7JXvsq4GRb8GCUk=", 
   "Shibboleth-sn": "Developer", 
@@ -214,6 +215,28 @@ class TestShibbolethGroupAssignment(TestCase):
     def test_group_creation_list(self):
         # Test for group creation from a list of group attributes
         with self.settings(SHIBBOLETH_GROUP_ATTRIBUTES=['Shibboleth-affiliation', 'Shibboleth-isMemberOf']):
+            reload(app_settings)
+            reload(middleware)
+            self.client.get('/', **SAMPLE_HEADERS)
+            user = User.objects.get(username='sampledeveloper@school.edu')
+            self.assertEqual(len(Group.objects.all()), 6)
+            self.assertEqual(len(user.groups.all()), 6)
+
+    def test_group_creation_list_comma(self):
+        # Test for group creation from a list of group attributes with a different delimiter
+        with self.settings(SHIBBOLETH_GROUP_ATTRIBUTES=['Shibboleth-isMemberOf-multi-delimiter'],
+                           SHIBBOLETH_GROUP_DELIMITERS=[',']):
+            reload(app_settings)
+            reload(middleware)
+            self.client.get('/', **SAMPLE_HEADERS)
+            user = User.objects.get(username='sampledeveloper@school.edu')
+            self.assertEqual(len(Group.objects.all()), 3)
+            self.assertEqual(len(user.groups.all()), 3)
+
+    def test_group_creation_list_mixed_comma_semicolon(self):
+        # Test for group creation from a list of group attributes with multiple delimiters
+        with self.settings(SHIBBOLETH_GROUP_ATTRIBUTES=['Shibboleth-affiliation', 'Shibboleth-isMemberOf-multi-delimiter'],
+                           SHIBBOLETH_GROUP_DELIMITERS=[',', ';']):
             reload(app_settings)
             reload(middleware)
             self.client.get('/', **SAMPLE_HEADERS)
