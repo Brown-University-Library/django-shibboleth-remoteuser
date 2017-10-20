@@ -21,7 +21,7 @@ GROUP_ATTRIBUTES = getattr(settings, 'SHIBBOLETH_GROUP_ATTRIBUTES', [])
 
 # If a group attribute is actually a list of groups, define the
 # delimiters used to split the list
-GROUP_DELIMITERS = getattr(settings, 'SHIBBOLETH_GROUP_DELIMITERS', [';', ','])
+GROUP_DELIMITERS = getattr(settings, 'SHIBBOLETH_GROUP_DELIMITERS', [';'])
 
 #Optional logout parameters
 #This should look like: https://sso.school.edu/idp/logout.jsp?return=%s
