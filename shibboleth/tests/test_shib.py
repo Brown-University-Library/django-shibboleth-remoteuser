@@ -7,7 +7,7 @@ from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User, Group
 from django.contrib.sessions.middleware import SessionMiddleware
-from django.test import TestCase, RequestFactory
+from django.test import TestCase, RequestFactory, Client
 
 
 SAMPLE_HEADERS = {
@@ -17,6 +17,7 @@ SAMPLE_HEADERS = {
   "Shib-AuthnContext-Class": "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified", 
   "Shib-Identity-Provider": "https://sso.college.edu/idp/shibboleth", 
   "Shib-Session-ID": "1", 
+  "Shib_Session_ID": "1",
   "Shib-Session-Index": "12", 
   "Shibboleth-affiliation": "member@college.edu;staff@college.edu", 
   "Shibboleth-schoolBarCode": "12345678",
@@ -60,6 +61,7 @@ settings.ROOT_URLCONF = 'shibboleth.urls'
 
 settings.SHIBBOLETH_LOGOUT_URL = 'https://sso.school.edu/logout?next=%s'
 settings.SHIBBOLETH_LOGOUT_REDIRECT_URL = 'http://school.edu/'
+settings.SHIBBOLETH_SINGLE_LOGOUT_BACKCHANNEL = True
 
 # MUST be imported after the settings above
 from shibboleth import app_settings
@@ -277,3 +279,42 @@ class LogoutTest(TestCase):
         self.assertEqual(resp.status_code, 302)
         # Make sure the context is empty.
         self.assertEqual(resp.context, None)
+
+
+class SingleLogoutBackchannelTest(TestCase):
+# separate client for post request; check logout
+    logout_req = """
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+  <s:Body>
+    <LogoutNotification xmlns="urn:mace:shibboleth:2.0:sp:notify" type="global">
+      <SessionID>%s</SessionID>
+    </LogoutNotification>
+  </s:Body>
+</s:Envelope>
+"""
+
+    def test_logout(self):
+        idp = Client()
+        # Login
+        login = self.client.get('/', **SAMPLE_HEADERS)
+        self.assertEqual(login.status_code, 200)
+        # back-channel logout
+        soap_resp = idp.post('/logoutNotification/', data=(self.logout_req % 1), content_type='text/xml;charset=UTF-8')
+        self.assertContains(soap_resp, "<tns:LogoutNotificationResponse><tns:OK/></tns:LogoutNotificationResponse>", status_code=200)
+        # Load root url to see if user is in fact logged out.
+        resp = self.client.get('/')
+        self.assertEqual(resp.status_code, 302)
+        # Make sure the context is empty.
+        self.assertEqual(resp.context, None)
+
+    def test_invalid_logout(self):
+        idp = Client()
+        # Login
+        login = self.client.get('/', **SAMPLE_HEADERS)
+        self.assertEqual(login.status_code, 200)
+        # invalid back-channel logout (raises Exception and returns Internal Server Error!)
+        soap_resp = idp.post('/logoutNotification/', data=(self.logout_req % 'NonExistentSession'), content_type='text/xml;charset=UTF-8')
+        self.assertContains(soap_resp, "Invalid session id", status_code=500)
+        # Load root url to see if user is still logged in
+        resp = self.client.get('/')
+        self.assertEqual(resp.status_code, 200)
