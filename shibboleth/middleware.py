@@ -5,7 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 import django.utils.version
 import re
 
-from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, GROUP_ATTRIBUTES, GROUP_DELIMITERS
+from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, GROUP_ATTRIBUTES, GROUP_DELIMITERS, SINGLE_LOGOUT_BACKCHANNEL
 from shibboleth.models import ShibSession
 
 
@@ -59,17 +59,21 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
             # by logging the user in.
             request.user = user
 
-            # workaround for bug in Django < 1.10
-            # fixed in Django commit 3389c5ea2
-            if request.session.session_key is None:
-                django_version = django.utils.version.get_complete_version()
-                if django_version[0] == 1 and django_version[1] < 10:
-                    request.session.create()
+            if SINGLE_LOGOUT_BACKCHANNEL:
+                # workaround for bug in Django < 1.10
+                # fixed in Django commit 3389c5ea2
+                if request.session.session_key is None:
+                    django_version = django.utils.version.get_complete_version()
+                    if django_version[0] == 1 and django_version[1] < 10:
+                        request.session.create()
 
             auth.login(request, user)
 
-            # store session mapping
-            ShibSession.objects.get_or_create(shib=request.META['Shib_Session_ID'], session_id=request.session.session_key)
+            if SINGLE_LOGOUT_BACKCHANNEL:
+                # store session mapping
+                ShibSession.objects.get_or_create(
+                    shib=request.META['Shib_Session_ID'],
+                    session_id=request.session.session_key)
 
             # Upgrade user groups if configured in the settings.py
             # If activated, the user will be associated with those groups.
