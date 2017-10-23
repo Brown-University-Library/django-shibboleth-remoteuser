@@ -182,6 +182,73 @@ default                     ``users`` and ``admins,managers``
 ``[',', ';']``              ``users``, ``admins``, and ``managers``
 =========================== =======================================
 
+
+Single Logout
+~~~~~~~~~~~~~
+
+`Single Logout`_ (SLO), if initiated by the Django webapp (called front-channel logout), is supported by pointing ``LOGOUT_REDIRECT_URL`` to the Shibboleth SP SLO endpoint (``/Shibboleth.sso/Logout``), if you are using the provided ShibbolethLogoutView for logout.
+
+If you want to support SLO initiated by another app or the IdP (back-channel logout), you need to enable it using the ``SINGLE_LOGOUT_BACKCHANNEL`` setting, but this feature requires additional dependencies. For more details, see the following sections.
+
+SLO is supported by Shibboleth IdP since 3.2.0 (with fixes in 3.2.1) and Shibboleth SP (version >=2.4 recommended).
+
+Additional Requirements
++++++++++++++++++++++++
+
+* lxml (tested with 4.1.0)
+* spyne (tested with 2.12.14)
+
+
+Configuration
++++++++++++++
+
+* Add shibboleth to installed apps.
+
+  .. code-block:: python
+
+      INSTALLED_APPS += (
+          'shibboleth',
+      )
+
+* Run migrations.
+
+  .. code-block:: bash
+
+     django-admin migrate
+
+
+* Add back-channel SLO endpoint to ``urlpatterns``, if you don't already include ``shibboleth.urls``.
+
+  .. code-block:: python
+
+     if SINGLE_LOGOUT_BACKCHANNEL:
+         from spyne.protocol.soap import Soap11
+         from spyne.server.django import DjangoView
+         from .slo_view import LogoutNotificationService
+
+         urlpatterns += [
+             url(r'^logoutNotification/', DjangoView.as_view(
+                 services=[LogoutNotificationService],
+                 tns='urn:mace:shibboleth:2.0:sp:notify',
+                 in_protocol=Soap11(validator='lxml'), out_protocol=Soap11())),
+         ]
+
+* Enable SLO in ``shibboleth2.xml`` of Shibboleth SP.
+
+  .. code-block:: xml
+
+     <Logout>SAML2 Local</Logout>
+
+* Configure SLO notification in ``shibboleth2.xml`` of Shibboleth SP.
+
+  .. code-block:: xml
+
+     <Notify
+            Channel="back"
+            Location="https://<yourserver>/shib/logoutNotification/" />
+
+
 .. |build-status| image:: https://travis-ci.org/Brown-University-Library/django-shibboleth-remoteuser.svg?branch=master&style=flat
    :target: https://travis-ci.org/Brown-University-Library/django-shibboleth-remoteuser
    :alt: Build status
+.. _`Single Logout`: https://wiki.shibboleth.net/confluence/display/SHIB2/SLOWebappAdaptation
