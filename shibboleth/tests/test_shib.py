@@ -7,6 +7,7 @@ from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User, Group
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.db.utils import IntegrityError
 from django.test import TestCase, RequestFactory
 
 
@@ -173,6 +174,56 @@ class TestShibbolethRemoteUserBackend(TestCase):
         # After authenticate the user again, the mail address must be set back to the shibboleth data
         user2 = auth.authenticate(remote_user='sampledeveloper@school.edu', shib_meta=shib_meta)
         self.assertEqual(user2.email, 'Sample_Developer@school.edu')
+
+    def test_authenticate_with_exclude_field(self):
+        shib_meta = self._get_valid_shib_meta()
+        shib_meta['email'] = None
+        # email is a required field at the ORM level, passing None throws an error
+        with self.assertRaises(IntegrityError):
+            auth.authenticate(remote_user='sampledeveloper@school.edu', shib_meta=shib_meta)
+
+        # using the exclude absent option works correctly
+        shib_meta.pop('email')
+        user = auth.authenticate(remote_user='sampledeveloper@school.edu', shib_meta=shib_meta)
+        self.assertEqual(user.email, '')
+
+
+class TestShibbolethParseAttributes(TestCase):
+
+    def setUp(self):
+        request_factory = RequestFactory()
+        self.test_request = request_factory.get('/')
+        self.test_request.META.update(**SAMPLE_HEADERS)
+
+    def test_present_required_attribute(self):
+        shib_meta, error = middleware.ShibbolethRemoteUserMiddleware.parse_attributes(self.test_request)
+        self.assertEqual(shib_meta["last_name"], SAMPLE_HEADERS["Shibboleth-sn"])
+        self.assertFalse(error)
+
+    def test_missing_required_attribute(self):
+        self.test_request.META.pop("Shibboleth-sn")
+        shib_meta, error = middleware.ShibbolethRemoteUserMiddleware.parse_attributes(self.test_request)
+        self.assertTrue(error)
+
+    def test_present_optional_attribute(self):
+        shib_meta, error = middleware.ShibbolethRemoteUserMiddleware.parse_attributes(self.test_request)
+        self.assertEqual(shib_meta["barcode"], SAMPLE_HEADERS["Shibboleth-schoolBarCode"])
+        self.assertFalse(error)
+
+    def test_missing_optional_attribute(self):
+        self.test_request.META.pop("Shibboleth-schoolBarCode")
+        shib_meta, error = middleware.ShibbolethRemoteUserMiddleware.parse_attributes(self.test_request)
+        self.assertEqual(shib_meta["barcode"], None)
+        self.assertFalse(error)
+
+    def test_missing_optional_attribute_with_exclude_option(self):
+        with self.settings(SHIBBOLETH_ATTRIBUTE_EXCLUDE_ABSENT_OPTIONAL_FIELD=True):
+            reload(app_settings)
+            reload(middleware)
+            self.test_request.META.pop("Shibboleth-schoolBarCode")
+            shib_meta, error = middleware.ShibbolethRemoteUserMiddleware.parse_attributes(self.test_request)
+            self.assertFalse('barcode' in shib_meta.keys())
+            self.assertFalse(error)
 
 
 class TestShibbolethGroupAssignment(TestCase):

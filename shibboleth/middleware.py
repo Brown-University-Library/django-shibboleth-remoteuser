@@ -4,7 +4,9 @@ from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
 import re
 
-from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, GROUP_ATTRIBUTES, GROUP_DELIMITERS
+from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, GROUP_ATTRIBUTES, \
+    GROUP_DELIMITERS, SHIB_ATTRIBUTE_EXCLUDE_ABSENT_OPTIONAL_FIELD
+
 
 
 class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
@@ -106,7 +108,8 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
         for header, attr in list(SHIB_ATTRIBUTE_MAP.items()):
             required, name = attr
             value = meta.get(header, None)
-            shib_attrs[name] = value
+            if value or not (required or SHIB_ATTRIBUTE_EXCLUDE_ABSENT_OPTIONAL_FIELD):
+                shib_attrs[name] = value
             if not value or value == '':
                 if required:
                     error = True
