@@ -213,17 +213,8 @@ class TestShibbolethParseAttributes(TestCase):
     def test_missing_optional_attribute(self):
         self.test_request.META.pop("Shibboleth-schoolBarCode")
         shib_meta, error = middleware.ShibbolethRemoteUserMiddleware.parse_attributes(self.test_request)
-        self.assertEqual(shib_meta["barcode"], None)
+        self.assertFalse('barcode' in shib_meta.keys())
         self.assertFalse(error)
-
-    def test_missing_optional_attribute_with_exclude_option(self):
-        with self.settings(SHIBBOLETH_ATTRIBUTE_EXCLUDE_ABSENT_OPTIONAL_FIELD=True):
-            reload(app_settings)
-            reload(middleware)
-            self.test_request.META.pop("Shibboleth-schoolBarCode")
-            shib_meta, error = middleware.ShibbolethRemoteUserMiddleware.parse_attributes(self.test_request)
-            self.assertFalse('barcode' in shib_meta.keys())
-            self.assertFalse(error)
 
 
 class TestShibbolethGroupAssignment(TestCase):

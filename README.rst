@@ -66,18 +66,6 @@ Installation and configuration
               "shib-mail": (False, "email"),
           }
 
-      In the case of optional attributes (like email above), the value None
-      will still be passed to Django's get_or_create function, overriding any
-      defaults. This may result in 'not-null constraint' failures. The
-      following setting is a workaround:
-
-      .. code-block:: python
-
-          SHIBBOLETH_ATTRIBUTE_EXCLUDE_ABSENT_OPTIONAL_FIELD = True
-
-      If an attribute is not provided by SAML, this option ignores the key
-      instead of passing `None` to the ORM.
-
     * Set the ``LOGIN_URL`` to the login handler of your Shibboleth installation.
       In most cases, this will be something like:
 

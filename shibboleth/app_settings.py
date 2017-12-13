@@ -8,8 +8,6 @@ default_shib_attributes = {
 } 
 
 SHIB_ATTRIBUTE_MAP = getattr(settings, 'SHIBBOLETH_ATTRIBUTE_MAP', default_shib_attributes)
-SHIB_ATTRIBUTE_EXCLUDE_ABSENT_OPTIONAL_FIELD = getattr(
-    settings, 'SHIBBOLETH_ATTRIBUTE_EXCLUDE_ABSENT_OPTIONAL_FIELD', False)
 #Set to true if you are testing and want to insert sample headers.
 SHIB_MOCK_HEADERS = getattr(settings, 'SHIBBOLETH_MOCK_HEADERS', False)
 
