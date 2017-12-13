@@ -106,10 +106,10 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
         for header, attr in list(SHIB_ATTRIBUTE_MAP.items()):
             required, name = attr
             value = meta.get(header, None)
-            shib_attrs[name] = value
-            if not value or value == '':
-                if required:
-                    error = True
+            if value:
+                shib_attrs[name] = value
+            elif required:
+                error = True
         return shib_attrs, error
 
     @staticmethod
