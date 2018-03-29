@@ -77,6 +77,17 @@ except ImportError:
         pass # this means we're on python 2, where reload is a builtin function
 
 
+def is_authenticated(user):
+    """
+    Helper function for testing authentication differently
+    between Django 2.0 and previous versions.
+    """
+    try:
+        return user.is_authenticated()
+    except TypeError:
+        return user.is_authenticated
+
+
 class AttributesTest(TestCase):
         
     def test_decorator_not_authenticated(self):
@@ -93,7 +104,7 @@ class AttributesTest(TestCase):
         self.assertEqual(user.email, 'Sample_Developer@school.edu')
         self.assertEqual(user.first_name, 'Sample')
         self.assertEqual(user.last_name, 'Developer')
-        self.assertTrue(user.is_authenticated())
+        self.assertTrue(is_authenticated(user))
         self.assertFalse(user.is_anonymous())
 
 
@@ -117,13 +128,13 @@ class TestShibbolethRemoteUserMiddleware(TestCase):
         self._process_request_through_middleware(test_request)
         #shouldn't have done anything - just return because no REMOTE_USER
         self.assertTrue('shib' not in test_request.session)
-        self.assertFalse(test_request.user.is_authenticated())
+        self.assertFalse(is_authenticated(test_request.user))
 
     def test_remote_user_empty(self):
         test_request = self.request_factory.get('/', REMOTE_USER='')
         response = self._process_request_through_middleware(test_request)
         self.assertTrue('shib' not in test_request.session)
-        self.assertFalse(test_request.user.is_authenticated())
+        self.assertFalse(is_authenticated(test_request.user))
 
 
 class TestShibbolethRemoteUserBackend(TestCase):
