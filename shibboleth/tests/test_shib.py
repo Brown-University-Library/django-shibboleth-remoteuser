@@ -54,7 +54,7 @@ settings.AUTHENTICATION_BACKENDS += (
     'shibboleth.backends.ShibbolethRemoteUserBackend',
 )
 
-if VERSION[0] < 2:
+if VERSION[0] < 2 and VERSION[1] < 10:
     settings.MIDDLEWARE_CLASSES = tuple(settings.MIDDLEWARE) + (
         'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
     )
