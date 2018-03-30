@@ -9,6 +9,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.db.utils import IntegrityError
 from django.test import TestCase, RequestFactory
+from django import VERSION
 
 
 SAMPLE_HEADERS = {
@@ -53,9 +54,14 @@ settings.AUTHENTICATION_BACKENDS += (
     'shibboleth.backends.ShibbolethRemoteUserBackend',
 )
 
-settings.MIDDLEWARE += [
-    'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
-]
+if VERSION[0] < 2:
+    settings.MIDDLEWARE_CLASSES = tuple(settings.MIDDLEWARE) + (
+        'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
+    )
+else:
+    settings.MIDDLEWARE += [
+        'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
+    ]
 
 settings.ROOT_URLCONF = 'shibboleth.urls'
 
