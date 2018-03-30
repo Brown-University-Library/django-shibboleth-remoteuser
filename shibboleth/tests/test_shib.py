@@ -53,9 +53,9 @@ settings.AUTHENTICATION_BACKENDS += (
     'shibboleth.backends.ShibbolethRemoteUserBackend',
 )
 
-settings.MIDDLEWARE_CLASSES += (
+settings.MIDDLEWARE += [
     'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
-)
+]
 
 settings.ROOT_URLCONF = 'shibboleth.urls'
 
@@ -88,6 +88,17 @@ def is_authenticated(user):
         return user.is_authenticated
 
 
+def is_anonymous(user):
+    """
+    Helper function for testing for anonymous differently
+    between Django 2.0 and previous versions.
+    """
+    try:
+        return user.is_anonymous()
+    except TypeError:
+        return user.is_anonymous
+
+
 class AttributesTest(TestCase):
         
     def test_decorator_not_authenticated(self):
@@ -105,7 +116,7 @@ class AttributesTest(TestCase):
         self.assertEqual(user.first_name, 'Sample')
         self.assertEqual(user.last_name, 'Developer')
         self.assertTrue(is_authenticated(user))
-        self.assertFalse(user.is_anonymous())
+        self.assertFalse(is_anonymous(user))
 
 
 class TestShibbolethRemoteUserMiddleware(TestCase):
