@@ -46,14 +46,14 @@ class QuickDjangoTest(object):
                 }
             },
             INSTALLED_APPS = self.INSTALLED_APPS + self.apps,
-            MIDDLEWARE_CLASSES = (
+            MIDDLEWARE = [
                     'django.contrib.sessions.middleware.SessionMiddleware',
                     'django.middleware.common.CommonMiddleware',
                     'django.middleware.csrf.CsrfViewMiddleware',
                     'django.contrib.auth.middleware.AuthenticationMiddleware',
                     'django.contrib.messages.middleware.MessageMiddleware',
                     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-                ),
+                ],
 	    ROOT_URLCONF = 'shib.urls',
             TEMPLATES = [
                 {

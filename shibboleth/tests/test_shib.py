@@ -9,6 +9,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.db.utils import IntegrityError
 from django.test import TestCase, RequestFactory
+from django import VERSION
 
 
 SAMPLE_HEADERS = {
@@ -53,9 +54,14 @@ settings.AUTHENTICATION_BACKENDS += (
     'shibboleth.backends.ShibbolethRemoteUserBackend',
 )
 
-settings.MIDDLEWARE_CLASSES += (
-    'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
-)
+if VERSION[0] < 2 and VERSION[1] < 10:
+    settings.MIDDLEWARE_CLASSES = tuple(settings.MIDDLEWARE) + (
+        'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
+    )
+else:
+    settings.MIDDLEWARE += [
+        'shibboleth.middleware.ShibbolethRemoteUserMiddleware',
+    ]
 
 settings.ROOT_URLCONF = 'shibboleth.urls'
 
@@ -77,6 +83,28 @@ except ImportError:
         pass # this means we're on python 2, where reload is a builtin function
 
 
+def is_authenticated(user):
+    """
+    Helper function for testing authentication differently
+    between Django 2.0 and previous versions.
+    """
+    try:
+        return user.is_authenticated()
+    except TypeError:
+        return user.is_authenticated
+
+
+def is_anonymous(user):
+    """
+    Helper function for testing for anonymous differently
+    between Django 2.0 and previous versions.
+    """
+    try:
+        return user.is_anonymous()
+    except TypeError:
+        return user.is_anonymous
+
+
 class AttributesTest(TestCase):
         
     def test_decorator_not_authenticated(self):
@@ -93,8 +121,8 @@ class AttributesTest(TestCase):
         self.assertEqual(user.email, 'Sample_Developer@school.edu')
         self.assertEqual(user.first_name, 'Sample')
         self.assertEqual(user.last_name, 'Developer')
-        self.assertTrue(user.is_authenticated())
-        self.assertFalse(user.is_anonymous())
+        self.assertTrue(is_authenticated(user))
+        self.assertFalse(is_anonymous(user))
 
 
 class TestShibbolethRemoteUserMiddleware(TestCase):
@@ -117,13 +145,13 @@ class TestShibbolethRemoteUserMiddleware(TestCase):
         self._process_request_through_middleware(test_request)
         #shouldn't have done anything - just return because no REMOTE_USER
         self.assertTrue('shib' not in test_request.session)
-        self.assertFalse(test_request.user.is_authenticated())
+        self.assertFalse(is_authenticated(test_request.user))
 
     def test_remote_user_empty(self):
         test_request = self.request_factory.get('/', REMOTE_USER='')
         response = self._process_request_through_middleware(test_request)
         self.assertTrue('shib' not in test_request.session)
-        self.assertFalse(test_request.user.is_authenticated())
+        self.assertFalse(is_authenticated(test_request.user))
 
 
 class TestShibbolethRemoteUserBackend(TestCase):
