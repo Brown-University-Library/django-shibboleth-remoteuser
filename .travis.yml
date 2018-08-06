@@ -1,6 +1,9 @@
-# Tell Travis you want a Python environment to test in
+#sudo & dist required so we can have py 3.7
+sudo: required
+dist: xenial
+
 language: python
-# List the versions of Python you'd like to test against
+
 python:
   - "2.7"
   - "3.4"
@@ -8,7 +11,6 @@ python:
   - "3.6"
   - "3.7"
 
-# List the versions of Django you'd like to test against
 env:
   - DJANGO_VERSION=1.11
   - DJANGO_VERSION=2.0
