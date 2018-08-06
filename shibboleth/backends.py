@@ -20,7 +20,7 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
     if hasattr(settings, 'CREATE_UNKNOWN_USER'):
         create_unknown_user = settings.CREATE_UNKNOWN_USER
 
-    def authenticate(self, remote_user, shib_meta):
+    def authenticate(self, request, remote_user, shib_meta):
         """
         The username passed as ``remote_user`` is considered trusted.  This
         method simply returns the ``User`` object with the given username,
@@ -64,13 +64,3 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
             user.save()
         return user if self.user_can_authenticate(user) else None
 
-    def user_can_authenticate(self, user):
-        """
-        Reject users with is_active=False. Custom user models that don't have
-        that attribute are allowed.
-
-        This is already provided in Django 1.10+ - included here to support
-        lower versions
-        """
-        is_active = getattr(user, 'is_active', None)
-        return is_active or is_active is None
