@@ -46,7 +46,8 @@ settings.SHIBBOLETH_ATTRIBUTE_MAP = {
    "Shib-Session-ID": (True, "session_id"),
    "Shibboleth-givenName": (True, "first_name"),
    "Shibboleth-sn": (True, "last_name"),
-   "Shibboleth-schoolBarCode": (False, "barcode")
+   "Shibboleth-schoolBarCode": (False, "barcode"),
+   "Shibboleth-displayName": (True, "shortened_name", lambda x: x[:5])
 }
 
 
@@ -222,6 +223,10 @@ class TestShibbolethParseAttributes(TestCase):
         self.assertFalse('barcode' in shib_meta.keys())
         self.assertFalse(error)
 
+    def test_mutated_attribute(self):
+        shib_meta, error = middleware.ShibbolethRemoteUserMiddleware.parse_attributes(self.test_request)
+        self.assertEqual(shib_meta["barcode"], SAMPLE_HEADERS["Shibboleth-schoolBarCode"])
+        self.assertEqual(shib_meta["shortened_name"], SAMPLE_HEADERS["Shibboleth-displayName"][:5])
 
 class TestShibbolethGroupAssignment(TestCase):
 

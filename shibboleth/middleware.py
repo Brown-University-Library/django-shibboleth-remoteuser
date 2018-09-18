@@ -105,10 +105,14 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
         error = False
         meta = request.META
         for header, attr in list(SHIB_ATTRIBUTE_MAP.items()):
-            required, name = attr
+            if len(attr) == 3:
+                required, name, attr_processor = attr
+            else:
+                required, name = attr
+                attr_processor = lambda x: x
             value = meta.get(header, None)
             if value:
-                shib_attrs[name] = value
+                shib_attrs[name] = attr_processor(value)
             elif required:
                 error = True
         return shib_attrs, error
