@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import RemoteUserBackend
 from django.conf import settings
+import inspect
 
 
 class ShibbolethRemoteUserBackend(RemoteUserBackend):
@@ -50,7 +51,12 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
                 """
                 user.set_unusable_password()
                 user.save()
-                user = self.configure_user(user)
+                args = (request, user)
+                try:
+                    inspect.getcallargs(self.configure_user, request, user)
+                except TypeError:
+                    args = (user,)
+                user = self.configure_user(*args)
         else:
             try:
                 user = User.objects.get(username=username)
