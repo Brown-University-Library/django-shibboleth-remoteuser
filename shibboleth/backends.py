@@ -53,7 +53,7 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
                 user.save()
                 args = (request, user)
                 try:
-                    inspect.getcallargs(self.configure_user, request, user)
+                    inspect.signature(self.configure_user).bind(request, user)
                 except TypeError:
                     args = (user,)
                 user = self.configure_user(*args)
