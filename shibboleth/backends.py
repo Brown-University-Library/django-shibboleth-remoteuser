@@ -54,6 +54,12 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
                 args = (request, user)
                 try:
                     inspect.signature(self.configure_user).bind(request, user)
+                except AttributeError:
+                    # getcallargs required for Python 2.7 support, deprecated after 3.5
+                    try:
+                        inspect.getcallargs(self.configure_user, request, user)
+                    except TypeError:
+                        args = (user,)
                 except TypeError:
                     args = (user,)
                 user = self.configure_user(*args)
