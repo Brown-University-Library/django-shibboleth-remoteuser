@@ -5,9 +5,9 @@ except ImportError:
 from django.utils.six.moves.urllib_parse import quote
 
 try:
-    from app_settings import LOGOUT_URL, LOGOUT_REDIRECT_URL, LOGIN_REDIRECT, LOGIN_URL_PARAMETER
+    from app_settings import LOGOUT_URL, LOGOUT_REDIRECT_URL, LOGIN_REDIRECT_URL, LOGIN_URL_PARAMETER
 except ImportError:
-    from .app_settings import LOGOUT_URL, LOGOUT_REDIRECT_URL, LOGIN_REDIRECT, LOGIN_URL_PARAMETER
+    from .app_settings import LOGOUT_URL, LOGOUT_REDIRECT_URL, LOGIN_REDIRECT_URL, LOGIN_URL_PARAMETER
 
 def login_link(request):
     """
