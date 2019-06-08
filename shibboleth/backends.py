@@ -40,6 +40,9 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
         # instead we use get_or_create when creating unknown users since it has
         # built-in safeguards for multiple threads.
         if self.create_unknown_user:
+            if 'username' in shib_user_params:
+                username = shib_user_params['username']
+
             user, created = User.objects.get_or_create(username=username, defaults=shib_user_params)
             if created:
                 """
