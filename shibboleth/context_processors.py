@@ -11,8 +11,8 @@ except ImportError:
 
 def login_link(request):
     """
-    This assumes your login link is the Shibboleth login page for your server
-    and uses the 'target' url parameter by default.
+    By default: this assumes your login link is the Shibboleth login page for your server
+    and uses the 'target' url parameter.
     """
     full_path = LOGIN_REDIRECT_URL or quote(request.get_full_path())
     login = reverse('shibboleth:login')
