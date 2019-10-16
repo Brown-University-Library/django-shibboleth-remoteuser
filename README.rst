@@ -85,7 +85,7 @@ Installation and configuration
 
 
 Verify configuration
---------
+--------------------
 If you would like to verify that everything is configured correctly,
 follow the next two steps below.  It will create a route in your application
 at ``/yourapp/shib/`` that echos the attributes obtained from Shibboleth.
