@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import RemoteUserBackend
 from django.conf import settings
-import inspect
 
 User = get_user_model()
 
@@ -70,16 +69,10 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
         """
         user.set_unusable_password()
         user.save()
-        args = (request, user)
         try:
-            inspect.signature(self.configure_user).bind(request, user)
-        except AttributeError:
-            # getcallargs required for Python 2.7 support, deprecated after 3.5
-            try:
-                inspect.getcallargs(self.configure_user, request, user)
-            except TypeError:
-                args = (user,)
-        return self.configure_user(*args)
+            return self.configure_user(request, user)
+        except TypeError: #on django < 2.2, configure_user just takes the user parameter
+            return self.configure_user(user)
 
     @staticmethod
     def update_user_params(user, params):
