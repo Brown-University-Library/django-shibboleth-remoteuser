@@ -69,7 +69,10 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
         """
         user.set_unusable_password()
         user.save()
-        return self.configure_user(request, user)
+        try:
+            return self.configure_user(request, user)
+        except TypeError: #on django < 2.2, configure_user just takes the user parameter
+            return self.configure_user(user)
 
     @staticmethod
     def update_user_params(user, params):
