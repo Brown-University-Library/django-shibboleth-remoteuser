@@ -6,11 +6,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views.generic import TemplateView
-
-try:
-    from django.utils.six.moves.urllib.parse import quote
-except ImportError:
-    from urllib.parse import quote  
+from urllib.parse import quote  
 
 #Logout settings.
 from shibboleth.app_settings import LOGOUT_URL, LOGOUT_REDIRECT_URL
