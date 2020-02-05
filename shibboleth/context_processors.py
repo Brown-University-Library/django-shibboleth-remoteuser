@@ -2,7 +2,7 @@ try:
     from django.core.urlresolvers import reverse
 except ImportError:
     from django.urls import reverse
-from django.utils.six.moves.urllib_parse import quote
+from urllib.parse import quote
 
 def login_link(request):
     """
