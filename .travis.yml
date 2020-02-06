@@ -10,9 +10,13 @@ python:
 
 env:
   - DJANGO_VERSION=1.11
-  - DJANGO_VERSION=2.1
   - DJANGO_VERSION=2.2
   - DJANGO_VERSION=3.0
+
+jobs:
+  exclude:
+    - DJANGO_VERSION: 3.0
+      python: 3.5
 
 install: 
  - pip install --upgrade pip
