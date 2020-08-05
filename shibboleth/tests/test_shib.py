@@ -5,12 +5,14 @@ from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.auth.middleware import RemoteUserMiddleware
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
+from django.contrib.auth import get_user_model
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.db.utils import IntegrityError
 from django.test import TestCase, RequestFactory
 from django import VERSION
 
+User = get_user_model()
 
 SAMPLE_HEADERS = {
   "REMOTE_USER": 'sampledeveloper@school.edu',
