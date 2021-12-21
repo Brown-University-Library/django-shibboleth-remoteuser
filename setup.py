@@ -84,7 +84,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
 
 setup(
       name = "django-shibboleth-remoteuser",
-      version='0.11a2',
+      version='0.12',
       long_description = read('README.rst'),
       author = 'Brown University Library',
       author_email = 'bdr@brown.edu',
@@ -93,4 +93,10 @@ setup(
       packages=packages,
       cmdclass = cmdclasses,
       data_files=data_files,
+      classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+      ],
+
 )

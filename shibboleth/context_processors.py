@@ -2,7 +2,7 @@ try:
     from django.core.urlresolvers import reverse
 except ImportError:
     from django.urls import reverse
-from django.utils.six.moves.urllib_parse import quote
+from urllib.parse import quote
 
 try:
     from app_settings import LOGOUT_URL, LOGOUT_REDIRECT_URL, LOGIN_REDIRECT_URL, LOGIN_URL_PARAMETER
