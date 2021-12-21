@@ -2,10 +2,10 @@
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
-#At a minimum you will need username, 
+#At a minimum you will need username,
 default_shib_attributes = {
   "REMOTE_USER": (True, "username"),
-} 
+}
 
 SHIB_ATTRIBUTE_MAP = getattr(settings, 'SHIBBOLETH_ATTRIBUTE_MAP', default_shib_attributes)
 #Set to true if you are testing and want to insert sample headers.
@@ -30,3 +30,8 @@ LOGOUT_URL = getattr(settings, 'SHIBBOLETH_LOGOUT_URL', None)
 #LOGOUT_REDIRECT_URL specifies a default logout page that will always be used when
 #users logout from Shibboleth.
 LOGOUT_REDIRECT_URL = getattr(settings, 'SHIBBOLETH_LOGOUT_REDIRECT_URL', None)
+#This is the parameter used to redirect after login. Old versions was used 'next' parameter.
+LOGIN_URL_PARAMETER = getattr(settings, 'SHIBBOLETH_LOGIN_URL_PARAMETER', 'target')
+#This should look like: /login
+#This is the LOGIN_URL_PARAMETER value. The endpoint after login
+LOGIN_REDIRECT_URL = getattr(settings, 'SHIBBOLETH_LOGIN_REDIRECT_URL', None)
