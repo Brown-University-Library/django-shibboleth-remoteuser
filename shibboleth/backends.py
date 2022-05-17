@@ -28,12 +28,10 @@ class ShibbolethRemoteUserBackend(RemoteUserBackend):
         if not remote_user:
             return
         username = self.clean_username(remote_user)
-        field_names = [x.name for x in User._meta.get_fields()]
-        shib_user_params = dict([(k, shib_meta[k]) for k in field_names if k in shib_meta])
 
-        user = self.setup_user(request=request, username=username, defaults=shib_user_params)
+        user = self.setup_user(request=request, username=username, defaults=shib_meta)
         if user:
-            self.update_user_params(user=user, params=shib_user_params)
+            self.update_user_params(user=user, params=shib_meta)
             return user if self.user_can_authenticate(user) else None
 
     def setup_user(self, request, username, defaults):
