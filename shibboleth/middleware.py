@@ -39,7 +39,7 @@ class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
         # persisted in the session and we don't need to continue.
         is_authenticated = request.user.is_authenticated
         if is_authenticated:
-            if request.user.username == self.clean_username(username, request):
+            if request.user.get_username() == self.clean_username(username, request):
                 return
 
         # Make sure we have all required Shiboleth elements before proceeding.
