@@ -5,9 +5,11 @@ from django.core.exceptions import ImproperlyConfigured
 #At a minimum you will need username, 
 default_shib_attributes = {
   "REMOTE_USER": (True, "username"),
-} 
+}
+default_shib_username_attribute = 'REMOTE_USER'
 
 SHIB_ATTRIBUTE_MAP = getattr(settings, 'SHIBBOLETH_ATTRIBUTE_MAP', default_shib_attributes)
+SHIB_USERNAME_ATTRIBUTE = getattr(settings, 'SHIBBOLETH_USERNAME_ATTRIBUTE', default_shib_username_attribute)
 #Set to true if you are testing and want to insert sample headers.
 SHIB_MOCK_HEADERS = getattr(settings, 'SHIBBOLETH_MOCK_HEADERS', False)
 

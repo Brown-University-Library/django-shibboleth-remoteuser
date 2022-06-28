@@ -4,10 +4,11 @@ from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
 import re
 
-from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, GROUP_ATTRIBUTES, GROUP_DELIMITERS
+from shibboleth.app_settings import SHIB_ATTRIBUTE_MAP, SHIB_USERNAME_ATTRIBUTE, GROUP_ATTRIBUTES, GROUP_DELIMITERS
 
 
 class ShibbolethRemoteUserMiddleware(RemoteUserMiddleware):
+    header = SHIB_USERNAME_ATTRIBUTE
     """
     Authentication Middleware for use with Shibboleth.  Uses the recommended pattern
     for remote authentication from: http://code.djangoproject.com/svn/django/tags/releases/1.3/django/contrib/auth/middleware.py
