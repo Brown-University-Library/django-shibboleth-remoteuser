@@ -11,6 +11,7 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.db.utils import IntegrityError
 from django.test import TestCase, RequestFactory
 from django import VERSION
+from unittest.mock import MagicMock
 
 User = get_user_model()
 
@@ -109,11 +110,12 @@ class AttributesTest(TestCase):
 class TestShibbolethRemoteUserMiddleware(TestCase):
 
     def setUp(self):
+        mock = MagicMock()
         self.request_factory = RequestFactory()
-        self.smw = SessionMiddleware()
-        self.amw = AuthenticationMiddleware()
-        self.rmw = RemoteUserMiddleware()
-        self.srmw = middleware.ShibbolethRemoteUserMiddleware()
+        self.smw = SessionMiddleware(mock)
+        self.amw = AuthenticationMiddleware(mock)
+        self.rmw = RemoteUserMiddleware(mock)
+        self.srmw = middleware.ShibbolethRemoteUserMiddleware(mock)
 
     def _process_request_through_middleware(self, request):
         self.smw.process_request(request)
