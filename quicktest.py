@@ -34,7 +34,7 @@ class QuickDjangoTest(object):
     
     def __configure_settings(self):
         settings.configure(
-            SECRET_KEY = "aassivengaa",
+            SECRET_KEY = "secret",
             DEBUG = True,
             DATABASES = {
                 'default': {
@@ -59,7 +59,7 @@ class QuickDjangoTest(object):
             TEMPLATES = [
                 {
                     'BACKEND': 'django.template.backends.django.DjangoTemplates',
-                    'DIRS': ["/home/enk/django-shibboleth-remoteuser/shibboleth/templates/"],
+                    'DIRS': ["shibboleth/templates/"],
                     'APP_DIRS': True,
                     'OPTIONS': {},
                 },
